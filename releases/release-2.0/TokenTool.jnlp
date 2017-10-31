@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="TokenTool.jnlp">
+  <information>
+    <title>TokenTool</title>
+    <vendor>Nerps</vendor>
+    <description>TokenTool</description>
+    <offline-allowed/>
+  <shortcut><desktop/></shortcut>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="TokenTool-2.0.jar" size="19439111" download="null" />
+  </resources>
+  <jfx:javafx-desc  width="0" height="0" main-class="net.rptools.tokentool.client.TokenTool"  name="TokenTool"  preloader-class="net.rptools.tokentool.client.SplashScreenLoader"/>
+  <update check="background"/>
+</jnlp>
