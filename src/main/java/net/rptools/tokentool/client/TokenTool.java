@@ -39,8 +39,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.AppSetup;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
 /**
@@ -52,25 +54,29 @@ import net.rptools.tokentool.util.ImageUtil;
  * 
  */
 public class TokenTool extends Application {
+	private static TokenTool appInstance;
+
 	private static Logger log; // Don't instantiate until AppSetup gets and sets user_home/logs directory in AppSetup
 
-	private static final String TOKEN_TOOL_ICON = "/net/rptools/tokentool/image/token_tool_icon.png";
-	private static final String TOKEN_TOOL_FXML = "/net/rptools/tokentool/view/TokenTool.fxml";
-	public static final String TOKEN_TOOL_BUNDLE = "net.rptools.tokentool.i18n.TokenTool";
-
-	private BorderPane root;
-	private TokenTool_Controller tokentool_Controller;
+	private static BorderPane root;
+	private static TokenTool_Controller tokentool_Controller;
 
 	private static String VERSION = "";
 	private static String VENDOR = "";
 
 	private static final int THUMB_SIZE = 100;
-	private int overlayCount = 0;
-	private int loadCount = 1;
-	private TreeItem<Path> overlayTreeItems;
+
+	private static int overlayCount = 0;
+	private static int loadCount = 1;
+	private static double deltaX = 0;
+	private static double deltaY = 0;
+
+	private static TreeItem<Path> overlayTreeItems;
+	private static Stage stage;
 
 	@Override
 	public void init() throws Exception {
+		appInstance = this;
 		VERSION = getVersion();
 
 		// Lets install/update the overlays if newer version
@@ -88,18 +94,52 @@ public class TokenTool extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
+		stage = primaryStage;
 		setUserAgentStylesheet(STYLESHEET_MODENA); // Setting the style back to the new Modena
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(TOKEN_TOOL_FXML), ResourceBundle.getBundle(TOKEN_TOOL_BUNDLE));
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.TOKEN_TOOL_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
 		root = fxmlLoader.load();
 		tokentool_Controller = (TokenTool_Controller) fxmlLoader.getController();
 
 		Scene scene = new Scene(root);
-		primaryStage.setTitle("TokenTool");
-		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(TOKEN_TOOL_ICON)));
+		primaryStage.setTitle(I18N.getString("TokenTool.stage.title"));
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
 		primaryStage.setScene(scene);
 
-		// Load all the overlays into the treeview
-		tokentool_Controller.updateOverlayTreeview(overlayTreeItems); // TODO: oh oh init is called before this! move this to init!
+		primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+			if (Double.isNaN(oldVal.doubleValue()))
+				return;
+
+			deltaX += newVal.doubleValue() - oldVal.doubleValue();
+
+			// Only adjust on even width adjustments
+			if (deltaX > 1 || deltaX < -1) {
+				if (deltaX % 2 == 0) {
+					tokentool_Controller.updatePortraitLocation(deltaX, 0);
+					deltaX = 0;
+				} else {
+					tokentool_Controller.updatePortraitLocation(deltaX - 1, 0);
+					deltaX = 1;
+				}
+			}
+		});
+
+		primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+			if (Double.isNaN(oldVal.doubleValue()))
+				return;
+
+			deltaY += newVal.doubleValue() - oldVal.doubleValue();
+
+			// Only adjust on even width adjustments
+			if (deltaY > 1 || deltaY < -1) {
+				if (deltaY % 2 == 0) {
+					tokentool_Controller.updatePortraitLocation(0, deltaY);
+					deltaY = 0;
+				} else {
+					tokentool_Controller.updatePortraitLocation(0, deltaY - 1);
+					deltaY = 1;
+				}
+			}
+		});
 
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
@@ -108,9 +148,30 @@ public class TokenTool extends Application {
 			}
 		});
 
-		primaryStage.show();
+		// Load all the overlays into the treeview
+		tokentool_Controller.updateOverlayTreeview(overlayTreeItems);
+
+		// Restore saved settings
+		AppPreferences.restorePreferences(tokentool_Controller);
+
+		// Add recent list to treeview
+		tokentool_Controller.updateOverlayTreeViewRecentFolder(true);
+
+		// Set the Overlay Options accordion to be default open view
 		tokentool_Controller.expandOverlayOptionsPane(true);
-		tokentool_Controller.updateTokenPreviewImageView();
+
+		primaryStage.show();
+
+		// Finally, update token preview image after everything is done loading
+		Platform.runLater(() -> tokentool_Controller.updateTokenPreviewImageView());
+	}
+
+	public static TokenTool getInstance() {
+		return appInstance;
+	}
+
+	public Stage getStage() {
+		return stage;
 	}
 
 	/**
@@ -228,8 +289,8 @@ public class TokenTool extends Application {
 	 */
 	public static void main(String[] args) {
 		Options cmdOptions = new Options();
-		cmdOptions.addOption("v", "version", true, "override version number");
-		cmdOptions.addOption("n", "vendor", true, "override vendor");
+		cmdOptions.addOption("v", "version", true, "override version number"); //$NON-NLS-2$ //$NON-NLS-3$
+		cmdOptions.addOption("n", "vendor", true, "override vendor"); //$NON-NLS-2$ //$NON-NLS-3$
 
 		VERSION = getCommandLineStringOption(cmdOptions, "version", args);
 		VENDOR = getCommandLineStringOption(cmdOptions, "vendor", args);

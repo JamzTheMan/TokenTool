@@ -22,9 +22,6 @@ import javafx.util.Duration;
 import net.rptools.tokentool.controller.SplashScreen_Controller;
 import javafx.scene.layout.StackPane;
 
-/**
- * Example of displaying a splash page for a standalone JavaFX application
- */
 public class SplashScreenLoader extends Preloader {
 	private final String TOKEN_TOOL_SPLASH_ICON = "/net/rptools/tokentool/image/token_tool_splash_icon.png";
 	private final String SPLASH_SCREEN_FXML = "/net/rptools/tokentool/view/SplashScreenLoader.fxml";
@@ -35,7 +32,6 @@ public class SplashScreenLoader extends Preloader {
 	private SplashScreen_Controller controller;
 
 	public void start(Stage stage) throws Exception {
-		// System.out.println("javafx.runtime.version: " + System.getProperties().get("javafx.runtime.version"));
 		setUserAgentStylesheet(STYLESHEET_CASPIAN); // I like the look of the this progress bar better for this screen...
 
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(SPLASH_SCREEN_FXML), ResourceBundle.getBundle(TOKEN_TOOL_BUNDLE));

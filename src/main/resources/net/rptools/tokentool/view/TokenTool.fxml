@@ -64,7 +64,7 @@
 						</Menu>
 						<Menu fx:id="helpAboutMenu" onAction="#helpAboutMenu_onAction" text="%menu.title.help">
 							<items>
-								<MenuItem disable="true" text="%menu.title.help.about" />
+								<MenuItem text="%menu.title.help.about" />
 							</items>
 						</Menu>
 					</menus>
@@ -109,7 +109,7 @@
 									<center>
 										<StackPane maxHeight="200.0" maxWidth="200.0" minHeight="200.0" minWidth="200.0" BorderPane.alignment="CENTER">
 											<children>
-												<ImageView fx:id="tokenImageView" fitHeight="190.0" fitWidth="190.0" onDragDetected="#tokenImageView_OnDragDetected" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+												<ImageView fx:id="tokenImageView" fitHeight="190.0" fitWidth="190.0" onDragDetected="#tokenImageView_OnDragDetected" onDragDone="#tokenImageView_OnDragDone" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
 													<image>
 														<Image url="@../image/gear-chrome-no-mask.png" />
 													</image>
@@ -127,30 +127,30 @@
 											<children>
 												<Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 													<panes>
-														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.background">
+														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.portrait">
 															<content>
 																<VBox spacing="5.0">
 																	<children>
-																		<Label maxWidth="1.7976931348623157E308" text="Background Color">
+																		<Label maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.Background_Color">
 																			<VBox.margin>
 																				<Insets bottom="-4.0" />
 																			</VBox.margin>
 																		</Label>
-																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="Choose color to use behind portrait image" VBox.vgrow="ALWAYS" />
+																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
 																		<Button fx:id="removeBackgroundButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundButton_onAction" text="Remove Background Color" />
-                                                      <Label text="Opacity">
+                                                      <Label text="%options.pane.portrait.label.Opacity">
                                                          <VBox.margin>
                                                             <Insets top="10.0" />
                                                          </VBox.margin>
                                                       </Label>
                                                       <Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
-                                                      <Label text="Gaussian Blur">
+                                                      <Label text="%options.pane.portrait.label.Gaussian_Blur">
                                                          <VBox.margin>
                                                             <Insets />
                                                          </VBox.margin>
                                                       </Label>
                                                       <Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
-                                                      <Label text="Glow" />
+                                                      <Label text="%options.pane.portrait.label.Glow" />
                                                       <Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
 																	</children>
 																</VBox>
@@ -221,11 +221,11 @@
 																					</children>
 																				</StackPane>
 																				<TreeView fx:id="overlayTreeView" prefWidth="50.0" showRoot="false" VBox.vgrow="ALWAYS" />
-																				<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="Use as token base?" />
+																				<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
                                                             <HBox spacing="5.0">
                                                                <children>
-                                                                  <Slider fx:id="overlayTransparencySlider" blockIncrement="0.5" majorTickUnit="0.25" max="1.0" maxWidth="1.7976931348623157E308" minorTickCount="5" value="1.0" />
-                                                                  <Label graphicTextGap="0.0" text="Opacity">
+                                                                  <Slider fx:id="overlayTransparencySlider" blockIncrement="0.5" majorTickUnit="0.25" max="1.0" maxWidth="1.7976931348623157E308" minorTickCount="5" value="1.0" HBox.hgrow="ALWAYS" />
+                                                                  <Label graphicTextGap="0.0" text="%options.pane.overlay.slider.Opacity">
                                                                      <opaqueInsets>
                                                                         <Insets />
                                                                      </opaqueInsets>
@@ -253,7 +253,7 @@
       																										<Insets bottom="8.0" left="4.0" right="4.0" top="8.0" />
       																									</padding>
       																									<tooltip>
-      																										<Tooltip text="Keep the aspect ratio of the overlay" />
+      																										<Tooltip text="%options.pane.overlay.tooltip.aspect" />
       																									</tooltip>
       																								</ToggleButton>
       																							</children>

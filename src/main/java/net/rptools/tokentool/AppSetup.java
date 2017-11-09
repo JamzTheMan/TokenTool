@@ -11,13 +11,13 @@ package net.rptools.tokentool;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.lang.CharEncoding;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
@@ -52,9 +52,9 @@ public class AppSetup {
 		String installedVersion = "0";
 		try {
 			if (overlayVer.exists()) {
-				installedVersion = FileUtils.readFileToString(overlayVer, CharEncoding.UTF_8);
+				installedVersion = FileUtils.readFileToString(overlayVer, Charset.defaultCharset());
 			} else {
-				FileUtils.writeStringToFile(overlayVer, versionString, CharEncoding.UTF_8);
+				FileUtils.writeStringToFile(overlayVer, versionString, Charset.defaultCharset());
 			}
 		} catch (IOException ioe) {
 			log.error(ioe);
@@ -69,7 +69,7 @@ public class AppSetup {
 
 			// Update version file to new version
 			try {
-				FileUtils.writeStringToFile(overlayVer, versionString, CharEncoding.UTF_8);
+				FileUtils.writeStringToFile(overlayVer, versionString, Charset.defaultCharset());
 			} catch (IOException e) {
 				log.error(e);
 			}

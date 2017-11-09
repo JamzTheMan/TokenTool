@@ -21,34 +21,26 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.util.I18N;
 
-/**
- * 
- * @author Jamz
- * 
- *         To see splashscreen during testing, use JVM arg: -Djavafx.preloader=net.rptools.tokentool.fx.view.SplashScreenLoader Otherwise splashscreen will only show when defined as
- *         JavaFX-Preloader-Class in the JAR manifest.
- * 
- */
 public class ManageOverlays {
 	private static final Logger log = LogManager.getLogger(ManageOverlays.class);
-
-	private static final String MANAGE_OVERLAYS_FXML = "/net/rptools/tokentool/view/ManageOverlays.fxml";
-	private static final String MANAGE_OVERLAYS_ICON = "/net/rptools/tokentool/image/token_tool_icon.png";
 
 	private Stage stage;
 
 	public ManageOverlays(TokenTool_Controller tokenTool_Controller) {
 		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(MANAGE_OVERLAYS_FXML), ResourceBundle.getBundle(TokenTool.TOKEN_TOOL_BUNDLE));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.MANAGE_OVERLAYS_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
 			Parent root = (Parent) fxmlLoader.load();
 
 			stage = new Stage();
 			Scene scene = new Scene(root);
 
-			stage.getIcons().add(new Image(getClass().getResourceAsStream(MANAGE_OVERLAYS_ICON)));
+			stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
 			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.setTitle(I18N.getString("ManageOverlays.stage.title"));
 			stage.setScene(scene);
 
 			stage.setOnCloseRequest(new EventHandler<WindowEvent>() {

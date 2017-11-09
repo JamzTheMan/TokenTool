@@ -19,30 +19,20 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.controller.RegionSelector_Controller;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.StageResizeMoveUtil;
 
-/**
- * 
- * @author Jamz
- * 
- *         To see splashscreen during testing, use JVM arg: -Djavafx.preloader=net.rptools.tokentool.fx.view.SplashScreenLoader Otherwise splashscreen will only show when defined as
- *         JavaFX-Preloader-Class in the JAR manifest.
- * 
- */
 public class RegionSelector {
 	private static final Logger log = LogManager.getLogger(RegionSelector.class);
-
-	private static final String REGION_SELECTOR_FXML = "/net/rptools/tokentool/view/RegionSelector.fxml";
-	private static final String REGION_SELECTOR_ICON = "/net/rptools/tokentool/image/region_selector_icon.png";
 
 	private RegionSelector_Controller regionSelector_Controller;
 	private Stage stage;
 
 	public RegionSelector(TokenTool_Controller tokenTool_Controller) {
 		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(REGION_SELECTOR_FXML), ResourceBundle.getBundle(TokenTool.TOKEN_TOOL_BUNDLE));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.REGION_SELECTOR_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
 			Parent root = (Parent) fxmlLoader.load();
 			regionSelector_Controller = (RegionSelector_Controller) fxmlLoader.getController();
 			regionSelector_Controller.setController(tokenTool_Controller);
@@ -52,7 +42,7 @@ public class RegionSelector {
 
 			scene.setFill(Color.TRANSPARENT);
 			stage.initStyle(StageStyle.TRANSPARENT);
-			stage.getIcons().add(new Image(getClass().getResourceAsStream(REGION_SELECTOR_ICON)));
+			stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.REGION_SELECTOR_ICON)));
 			stage.setScene(scene);
 
 			StageResizeMoveUtil.addResizeListener(stage);

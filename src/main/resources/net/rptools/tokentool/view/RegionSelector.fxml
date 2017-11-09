@@ -10,8 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="selectionStackPane" minHeight="300.0" minWidth="300.0" styleClass="selection-region-pane" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/8.0.111"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.RegionSelector_Controller">
+<StackPane fx:id="selectionStackPane" minHeight="300.0" minWidth="300.0" styleClass="selection-region-pane" stylesheets="@../css/TokenTool.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.RegionSelector_Controller">
 	<children>
 		<GridPane>
 			<columnConstraints>
@@ -30,20 +29,17 @@
 						<Image url="@../image/corner-drag-35px.png" />
 					</image>
 				</ImageView>
-				<ImageView cache="true" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" rotate="-90.0" GridPane.halignment="LEFT" GridPane.rowIndex="2"
-					GridPane.valignment="BOTTOM">
+				<ImageView cache="true" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" rotate="-90.0" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
 					<image>
 						<Image url="@../image/corner-drag-35px.png" />
 					</image>
 				</ImageView>
-				<ImageView cache="true" layoutX="10.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true" rotate="90.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
-					GridPane.valignment="TOP">
+				<ImageView cache="true" layoutX="10.0" layoutY="260.0" pickOnBounds="true" preserveRatio="true" rotate="90.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="TOP">
 					<image>
 						<Image url="@../image/corner-drag-35px.png" />
 					</image>
 				</ImageView>
-				<ImageView cache="true" layoutX="210.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true" rotate="180.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT"
-					GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+				<ImageView cache="true" layoutX="210.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true" rotate="180.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
 					<image>
 						<Image url="@../image/corner-drag-35px.png" />
 					</image>
@@ -53,8 +49,7 @@
 						<Image url="@../image/side-drag-35px.png" />
 					</image>
 				</ImageView>
-				<ImageView cache="true" layoutX="10.0" layoutY="143.0" pickOnBounds="true" preserveRatio="true" rotate="-180.0" scaleY="2.0" GridPane.columnIndex="2"
-					GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+				<ImageView cache="true" layoutX="10.0" layoutY="143.0" pickOnBounds="true" preserveRatio="true" rotate="-180.0" scaleY="2.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
 					<image>
 						<Image url="@../image/side-drag-35px.png" />
 					</image>
@@ -69,7 +64,7 @@
 						<Image url="@../image/side-drag-35px.png" />
 					</image>
 				</ImageView>
-				<Button fx:id="captureButton" defaultButton="true" mnemonicParsing="false" onAction="#captureButton_onAction" text="Capture" GridPane.columnIndex="1" GridPane.rowIndex="2">
+				<Button fx:id="captureButton" defaultButton="true" mnemonicParsing="false" onAction="#captureButton_onAction" text="%RegionSelector.button.Capture" GridPane.columnIndex="1" GridPane.rowIndex="2">
 					<GridPane.margin>
 						<Insets bottom="20.0" />
 					</GridPane.margin>

@@ -57,6 +57,7 @@ import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppSetup;
 import net.rptools.tokentool.model.OverlayTreeItem;
 import net.rptools.tokentool.util.FileSaveUtil;
+import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
 public class ManageOverlays_Controller {
@@ -114,7 +115,6 @@ public class ManageOverlays_Controller {
 	public void displayTreeView() {
 		TreeItem<Path> root = new OverlayTreeItem(AppConstants.OVERLAY_DIR);
 		root.setExpanded(true);
-		// overlayTreeView = new TreeView<Path>(root);
 		overlayTreeView.setRoot(root);
 
 		overlayTreeView.setCellFactory(treeView -> new TreeCell<Path>() {
@@ -253,18 +253,18 @@ public class ManageOverlays_Controller {
 	}
 
 	private boolean confirmDelete(LinkedList<File> overlayFiles) {
-		String confirmationText = "Are you sure you want to delete ";
+		String confirmationText = I18N.getString("ManageOverlays.dialog.delete.confirmation");
 
 		if (overlayFiles.isEmpty())
 			return false;
 		else if (overlayFiles.size() == 1) {
 			confirmationText += overlayFiles.get(0).getName() + "?";
 		} else {
-			confirmationText += "these " + overlayFiles.size() + " overlays?";
+			confirmationText += I18N.getString("ManageOverlays.dialog.delete.confirmation.these") + overlayFiles.size() + I18N.getString("ManageOverlays.dialog.delete.confirmation.overlays");
 		}
 
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Delete Overlays");
+		alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.title"));
 		alert.setContentText(confirmationText);
 
 		Optional<ButtonType> result = alert.showAndWait();
@@ -277,17 +277,17 @@ public class ManageOverlays_Controller {
 	}
 
 	private boolean confirmDelete(File dir) {
-		String confirmationText = "Are you sure you want to delete the ";
+		String confirmationText = I18N.getString("ManageOverlays.dialog.delete.dir.confirmation");
 		long dirSize = FileUtils.listFiles(dir, ImageUtil.SUPPORTED_FILE_FILTER, TrueFileFilter.INSTANCE).size();
 
 		if (dirSize == 0) {
-			confirmationText += dir.getName() + " directory?";
+			confirmationText += dir.getName() + I18N.getString("ManageOverlays.dialog.delete.dir.confirmation.directory");
 		} else {
-			confirmationText += dir.getName() + " directory containing " + dirSize + " overlays?";
+			confirmationText += dir.getName() + I18N.getString("ManageOverlays.dialog.delete.dir.directory_containing") + dirSize + I18N.getString("ManageOverlays.dialog.delete.dir.overlays");
 		}
 
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Delete Directory");
+		alert.setTitle(I18N.getString("ManageOverlays.dialog.delete.dir.title"));
 		alert.setContentText(confirmationText);
 
 		Optional<ButtonType> result = alert.showAndWait();
@@ -326,7 +326,6 @@ public class ManageOverlays_Controller {
 
 		if (confirmDelete(currentDirectory)) {
 			try {
-				// FileUtils.deleteDirectory(currentDirectory);
 				FileUtils.forceDelete(currentDirectory);
 			} catch (IOException e) {
 				log.info("Deleting: " + currentDirectory.getAbsolutePath());
@@ -339,8 +338,9 @@ public class ManageOverlays_Controller {
 	@FXML
 	void addOverlayButton_onAction(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Select Image Files");
+		fileChooser.setTitle(I18N.getString("ManageOverlays.filechooser.overlay.title"));
 		fileChooser.getExtensionFilters().addAll(ImageUtil.GET_EXTENSION_FILTERS());
+
 		if (lastSelectedDirectory != null)
 			fileChooser.setInitialDirectory(lastSelectedDirectory);
 
@@ -359,9 +359,8 @@ public class ManageOverlays_Controller {
 	@FXML
 	void addFolderButton_onAction(ActionEvent event) {
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("Create New Directory");
-		// dialog.setHeaderText("Look, a Text Input Dialog");
-		dialog.setContentText("Name of Directory:");
+		dialog.setTitle(I18N.getString("ManageOverlays.filechooser.folder.title"));
+		dialog.setContentText(I18N.getString("ManageOverlays.filechooser.folder.content_text"));
 
 		Optional<String> result = dialog.showAndWait();
 		result.ifPresent(name -> {
@@ -375,8 +374,8 @@ public class ManageOverlays_Controller {
 	@FXML
 	void restoreButton_onAction(ActionEvent event) {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Restore Overlays");
-		alert.setContentText("Are you sure you want to restore all the default overlays?");
+		alert.setTitle(I18N.getString("ManageOverlays.dialog.restore.overlays.title"));
+		alert.setContentText(I18N.getString("ManageOverlays.dialog.restore.overlays.content_text"));
 
 		Optional<ButtonType> result = alert.showAndWait();
 
@@ -427,10 +426,10 @@ public class ManageOverlays_Controller {
 	@FXML
 	void overlayViewFlowPane_DragOver(DragEvent event) {
 		if (event.getDragboard().hasImage() || event.getDragboard().hasFiles() || event.getDragboard().hasUrl()) {
-			// Set Pane color to an alpha green
+			// TODO: Set Pane color to an alpha green
 			event.acceptTransferModes(TransferMode.COPY);
 		} else {
-			// Set Pane color to an alpha red?
+			// TODO: Set Pane color to an alpha red?
 			event.acceptTransferModes(TransferMode.ANY);
 		}
 	}

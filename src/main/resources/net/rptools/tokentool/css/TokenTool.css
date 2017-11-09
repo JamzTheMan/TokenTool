@@ -110,3 +110,8 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
 }
+
+/* CSS For Credits window */
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent ;
+}

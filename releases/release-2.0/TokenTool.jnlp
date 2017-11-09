@@ -9,7 +9,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="TokenTool-2.0.jar" size="19439111" download="null" />
+    <jar href="TokenTool-2.0.jar" size="19171377" download="null" />
   </resources>
   <jfx:javafx-desc  width="0" height="0" main-class="net.rptools.tokentool.client.TokenTool"  name="TokenTool"  preloader-class="net.rptools.tokentool.client.SplashScreenLoader"/>
   <update check="background"/>

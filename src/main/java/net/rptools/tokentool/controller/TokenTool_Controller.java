@@ -15,13 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -83,9 +82,11 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
+import net.rptools.tokentool.client.Credits;
 import net.rptools.tokentool.client.ManageOverlays;
 import net.rptools.tokentool.client.RegionSelector;
 import net.rptools.tokentool.util.FileSaveUtil;
+import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
 public class TokenTool_Controller {
@@ -146,10 +147,10 @@ public class TokenTool_Controller {
 	private static AtomicInteger loadCount = new AtomicInteger(0);
 
 	private static int overlayCount;
-	private static int recentTreeItemIndex = -1;
 
 	private static TreeItem<Path> treeItems;
 	private static TreeItem<Path> lastSelectedItem;
+	private static TreeItem<Path> recentFolder = new TreeItem<>(new File(AppConstants.OVERLAY_DIR, "Recent").toPath(), null);
 
 	private static Map<Path, TreeItem<Path>> recentOverlayTreeItems = new LinkedHashMap<Path, TreeItem<Path>>() {
 		private static final long serialVersionUID = 2579964060760662199L;
@@ -222,7 +223,6 @@ public class TokenTool_Controller {
 
 		assert overlayTreeProgressBar != null : "fx:id=\"overlayTreeProgressIndicator\" was not injected: check your FXML file 'ManageOverlays.fxml'.";
 
-		// executorService = Executors.newSingleThreadScheduledExecutor(runable -> {
 		executorService = Executors.newCachedThreadPool(runable -> {
 			loadOverlaysThread = Executors.defaultThreadFactory().newThread(runable);
 			loadOverlaysThread.setDaemon(true);
@@ -293,11 +293,6 @@ public class TokenTool_Controller {
 				.addListener((observable, oldValue, newValue) -> overlayWidthSpinner_onTextChanged(oldValue, newValue));
 		overlayHeightSpinner.valueProperty().addListener(
 				(observable, oldValue, newValue) -> overlayHeightSpinner_onTextChanged(oldValue, newValue));
-
-		// Restore saved preferences
-		AppPreferences.restorePreferences(this);
-
-		// updateOverlayTreeViewRecentFolder();
 	}
 
 	@FXML
@@ -336,8 +331,8 @@ public class TokenTool_Controller {
 		try {
 			File tempTokenFile = fileSaveUtil.getTempFileName(false, useFileNumberingCheckbox.isSelected(),
 					fileNameTextField.getText(), fileNameSuffixTextField);
-			ImageIO.write(SwingFXUtils.fromFXImage(tokenImageView.getImage(), null), "png", tempTokenFile);
 
+			writeTokenImage(tempTokenFile);
 			content.putFiles(java.util.Collections.singletonList(tempTokenFile));
 			tempTokenFile.deleteOnExit();
 		} catch (Exception e) {
@@ -367,11 +362,7 @@ public class TokenTool_Controller {
 					if (cbImage != null)
 						updatePortrait(cbImage);
 
-					String tokenName = FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm());
-					if (!tokenName.isEmpty())
-						fileNameTextField.setText(tokenName);
-					else
-						fileNameTextField.setText("token");
+					updateFileNameTextField(FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm()));
 				} catch (Exception e) {
 					log.error("Could not load image " + file);
 					e.printStackTrace();
@@ -392,11 +383,7 @@ public class TokenTool_Controller {
 				if (cbImage != null)
 					updatePortrait(cbImage);
 
-				String tokenName = FilenameUtils.getBaseName(clipboard.getUrl());
-				if (!tokenName.isEmpty())
-					fileNameTextField.setText(tokenName);
-				else
-					fileNameTextField.setText("token");
+				updateFileNameTextField(FilenameUtils.getBaseName(clipboard.getUrl()));
 			} catch (IllegalArgumentException e) {
 				log.info(e);
 			}
@@ -406,11 +393,7 @@ public class TokenTool_Controller {
 				if (cbImage != null)
 					updatePortrait(cbImage);
 
-				String tokenName = FilenameUtils.getBaseName(clipboard.getString());
-				if (!tokenName.isEmpty())
-					fileNameTextField.setText(tokenName);
-				else
-					fileNameTextField.setText("token");
+				updateFileNameTextField(FilenameUtils.getBaseName(clipboard.getString()));
 			} catch (IllegalArgumentException e) {
 				log.info(e);
 			}
@@ -419,8 +402,8 @@ public class TokenTool_Controller {
 
 	@FXML
 	void helpAboutMenu_onAction(ActionEvent event) {
-		log.info("helpAboutMenu_onAction invoked!");
-		// TokenTool.getFrame().showAboutDialog();
+		@SuppressWarnings("unused")
+		Credits credits = new Credits(this);
 	}
 
 	@FXML
@@ -495,12 +478,7 @@ public class TokenTool_Controller {
 		if (db.hasFiles()) {
 			db.getFiles().forEach(file -> {
 				try {
-					String tokenName = FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm());
-					if (!tokenName.isEmpty())
-						fileNameTextField.setText(tokenName);
-					else
-						fileNameTextField.setText("token");
-
+					updateFileNameTextField(FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm()));
 					updatePortrait(new Image(file.toURI().toURL().toExternalForm()));
 				} catch (Exception e) {
 					log.error("Could not load image " + file, e);
@@ -511,12 +489,7 @@ public class TokenTool_Controller {
 			updatePortrait(db.getImage());
 			event.setDropCompleted(true);
 		} else if (db.hasUrl()) {
-			String tokenName = FilenameUtils.getBaseName(db.getUrl());
-			if (!tokenName.isEmpty())
-				fileNameTextField.setText(tokenName);
-			else
-				fileNameTextField.setText("token");
-
+			updateFileNameTextField(FilenameUtils.getBaseName(db.getUrl()));
 			updatePortrait(new Image(db.getUrl()));
 			event.setDropCompleted(true);
 		}
@@ -549,14 +522,7 @@ public class TokenTool_Controller {
 			File tempTokenFile = fileSaveUtil.getTempFileName(saveAsToken, useFileNumberingCheckbox.isSelected(),
 					fileNameTextField.getText(), fileNameSuffixTextField);
 
-			// if (saveAsToken) {
-			// AppActions.saveToken(tempTokenFile, true);
-			// } else {
-			ImageIO.write(SwingFXUtils.fromFXImage(tokenImageView.getImage(), null), "png", tempTokenFile);
-			// log.debug("Drag size: " + tokenImageView.getImage().getWidth() + ",
-			// " + tokenImageView.getImage().getHeight());
-			// }
-
+			writeTokenImage(tempTokenFile);
 			content.putFiles(java.util.Collections.singletonList(tempTokenFile));
 			tempTokenFile.deleteOnExit();
 		} catch (Exception e) {
@@ -566,6 +532,12 @@ public class TokenTool_Controller {
 			db.setContent(content);
 			event.consume();
 		}
+	}
+
+	@FXML
+	void tokenImageView_OnDragDone(DragEvent event) {
+		if (event.getAcceptedTransferMode() != null)
+			updateOverlayTreeViewRecentFolder(true);
 	}
 
 	@FXML
@@ -636,52 +608,16 @@ public class TokenTool_Controller {
 		updateTokenPreviewImageView();
 	}
 
-	/*
-	 * getter/setter methods, mainly for user preferences
-	 */
-	public double getOverlayWidth() {
-		return overlayWidthSpinner.getValue();
+	public Map<Path, TreeItem<Path>> getRecentOverlayTreeItems() {
+		return recentOverlayTreeItems;
 	}
 
-	public void setOverlayWidth(double newValue) {
-		overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
-	}
-
-	public double getOverlayHeight() {
-		return overlayHeightSpinner.getValue();
-	}
-
-	public void setOverlayHeight(double newValue) {
-		overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
-	}
-
-	public boolean getOverlayAspect() {
-		return overlayAspectToggleButton.isSelected();
-	}
-
-	public void setOverlayAspect(boolean selected) {
-		// UI normally starts this toggle as selected == aspect locked
-		if (!selected)
-			overlayAspectToggleButton.fire();
-	}
-
-	public boolean getOverlayUseAsBase() {
-		return overlayUseAsBaseCheckbox.isSelected();
-
-	}
-
-	public void setOverlayUseAsBase(boolean selected) {
-		if (selected)
-			overlayUseAsBaseCheckbox.fire();
-	}
-
-	public Set<Path> getRecentOverlayTreeItems() {
-		return recentOverlayTreeItems.keySet();
-	}
-
-	public void addRecentOverlayTreeItem(Path filePath) {
+	public void updateRecentOverlayTreeItems(Path filePath) {
 		try {
 			TreeItem<Path> recentOverlay = new TreeItem<Path>(filePath, ImageUtil.getOverlayThumb(new ImageView(), filePath));
+
+			// Remove first so if it is on the list it forces to top of list
+			recentOverlayTreeItems.remove(filePath);
 			recentOverlayTreeItems.put(filePath, recentOverlay);
 		} catch (IOException e) {
 			log.error("Error loading recent overlay preference for " + filePath.toString());
@@ -707,100 +643,83 @@ public class TokenTool_Controller {
 	}
 
 	private void saveToken() {
-		boolean asToken = false; // TODO: Get from checkbox Save Option if this is implemented later
 		FileChooser fileChooser = new FileChooser();
 
 		try {
-			File tokenFile = fileSaveUtil.getFileName(asToken, useFileNumberingCheckbox.isSelected(),
-					fileNameTextField.getText(), fileNameSuffixTextField);
+			File tokenFile = fileSaveUtil.getFileName(false, useFileNumberingCheckbox.isSelected(), fileNameTextField.getText(), fileNameSuffixTextField);
 			fileChooser.setInitialFileName(tokenFile.getName());
 			if (tokenFile.getParentFile() != null)
 				if (tokenFile.getParentFile().isDirectory())
 					fileChooser.setInitialDirectory(tokenFile.getParentFile());
 		} catch (IOException e1) {
 			log.error("Error writing token!", e1);
-			;
 		}
 
 		fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
-
-		// if (asToken) {
-		// fileChooser.setTitle("Save as Token");
-		// fileChooser.setSelectedExtensionFilter(AppConstants.TOKEN_EXTENSION_FILTER);
-		// } else {
-		fileChooser.setTitle("Save as Image");
+		fileChooser.setTitle(I18N.getString("TokenTool.save.filechooser.title"));
 		fileChooser.setSelectedExtensionFilter(AppConstants.IMAGE_EXTENSION_FILTER);
-		// }
 
 		File tokenSaved = fileChooser.showSaveDialog(saveOptionsPane.getScene().getWindow());
 
 		if (tokenSaved == null)
 			return;
 
-		log.debug("selected: " + fileChooser.getSelectedExtensionFilter().getDescription());
-		log.debug("Saving token to : " + tokenSaved.getAbsolutePath());
+		writeTokenImage(tokenSaved);
 
-		try {
-			// if (fileChooser.getSelectedExtensionFilter().equals(AppConstants.TOKEN_EXTENSION_FILTER)) {
-			// AppActions.saveToken(tokenSaved, true);
-			// } else {
-			ImageIO.write(SwingFXUtils.fromFXImage(tokenImageView.getImage(), null), "png", tokenSaved);
-			// }
-
-			if (!useFileNumberingCheckbox.isSelected()) {
-				fileNameTextField.setText(FilenameUtils.getBaseName(tokenSaved.getName()));
-				fileSaveUtil.setLastFile(tokenSaved);
-			}
-
-			updateOverlayTreeViewRecentFolder();
-
-			log.debug("tokenSaved is " + tokenSaved);
-
-		} catch (Exception e) {
-			log.error(e);
-		}
+		updateFileNameTextField(FilenameUtils.getBaseName(tokenSaved.getName()));
+		FileSaveUtil.setLastFile(tokenSaved);
+		updateOverlayTreeViewRecentFolder(true);
 	}
 
-	public void updateOverlayTreeViewRecentFolder() {
-		if (lastSelectedItem != null) {
-			// Remove before adding to put it at the top of the list
-			recentOverlayTreeItems.remove(lastSelectedItem.getValue());
-			recentOverlayTreeItems.put(lastSelectedItem.getValue(), lastSelectedItem);
+	private boolean writeTokenImage(File tokenFile) {
+		try {
+			Image tokenImage = ImageUtil.resizeCanvas(tokenImageView.getImage(), getOverlayWidth(), getOverlayHeight());
+
+			return ImageIO.write(SwingFXUtils.fromFXImage(tokenImage, null), "png", tokenFile);
+		} catch (IOException e) {
+			log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
 		}
+
+		return false;
+	}
+
+	public void updateOverlayTreeViewRecentFolder(boolean selectMostRecent) {
+		if (lastSelectedItem != null)
+			updateRecentOverlayTreeItems(lastSelectedItem.getValue());
 
 		// Update Recent Overlay List
 		if (!recentOverlayTreeItems.isEmpty()) {
-			log.info("recent: " + recentOverlayTreeItems.keySet().toString());
-
-			TreeItem<Path> recentFolder = new TreeItem<>(new File(AppConstants.OVERLAY_DIR, "Recent").toPath(), null);
-
-			// convert to ArrayList of key set
-			List<TreeItem<Path>> recentOverlayTreeItemsReversed = new ArrayList<TreeItem<Path>>(recentOverlayTreeItems.values());
-
-			// reverse order of keys
-			Collections.reverse(recentOverlayTreeItemsReversed);
-
-			// Add recent overlays sorted most recent to top
-			recentFolder.getChildren().addAll(recentOverlayTreeItemsReversed);
-
 			// Remember current selection (adding/removing tree items messes with the selection model)
-			int selectedItem = overlayTreeView.getSelectionModel().getSelectedIndex();
+			// int selectedItem = overlayTreeView.getSelectionModel().getSelectedIndex();
 			overlayTreeView.getSelectionModel().clearSelection();
 
-			// If Recent folder item already exists, remove it
-			if (recentTreeItemIndex >= 0)
-				overlayTreeView.getRoot().getChildren().remove(recentTreeItemIndex);
+			// Clear current folder
+			recentFolder.getChildren().clear();
 
-			// Add the Recent folder item
+			// Add recent list to recentFolder in reverse order so most recent is at the top
+			ListIterator<Entry<Path, TreeItem<Path>>> iter = new ArrayList<>(recentOverlayTreeItems.entrySet()).listIterator(recentOverlayTreeItems.size());
+			while (iter.hasPrevious())
+				recentFolder.getChildren().add(iter.previous().getValue());
+
+			if (overlayTreeView.getRoot().getChildren().indexOf(recentFolder) == -1) {
+				overlayTreeView.getRoot().getChildren().add(recentFolder);
+			} else {
+				overlayTreeView.getRoot().getChildren().remove(recentFolder);
+				overlayTreeView.getRoot().getChildren().add(recentFolder);
+			}
+
+			// Auto expand recent folder...
 			recentFolder.setExpanded(true);
-			overlayTreeView.getRoot().getChildren().add(recentFolder);
+
 			addPseudoClassToLeafs(overlayTreeView);
 
-			// Set the selected index back to what it was
-			overlayTreeView.getSelectionModel().clearAndSelect(selectedItem);
+			// Set the selected index back to what it was unless...
+			if (selectMostRecent) {
+				overlayTreeView.getSelectionModel().select(recentFolder.getChildren().get(0));
+			} else {
+				// overlayTreeView.getSelectionModel().clearAndSelect(selectedItem);
+			}
 
-			// Save the index of the Recent folder item just added
-			recentTreeItemIndex = overlayTreeView.getRoot().getChildren().indexOf(recentFolder);
 		}
 	}
 
@@ -892,11 +811,13 @@ public class TokenTool_Controller {
 	}
 
 	private void treeViewFinish() {
+		log.info("***treeViewFinish called");
 		// Sort the nodes off of root
 		treeItems = sortTreeNodes(treeItems);
 
 		updateOverlayTreeview(treeItems);
 		addPseudoClassToLeafs(overlayTreeView);
+		updateOverlayTreeViewRecentFolder(false);
 
 		// overlayNameLabel.setVisible(true);
 		overlayTreeProgressBar.setStyle("-fx-accent: forestgreen;");
@@ -934,8 +855,6 @@ public class TokenTool_Controller {
 					if (loadOverlaysThread.isInterrupted())
 						break;
 
-					// log.info("Caching " + file.getAbsolutePath());
-
 					if (file.isDirectory()) {
 						cacheOverlays(file, root, THUMB_SIZE);
 					} else {
@@ -943,10 +862,8 @@ public class TokenTool_Controller {
 						TreeItem<Path> imageNode = new TreeItem<>(filePath, ImageUtil.getOverlayThumb(new ImageView(), filePath));
 						root.getChildren().add(imageNode);
 						loadCount.getAndIncrement();
+						updateProgress(loadCount.doubleValue(), overlayCount);
 					}
-
-					updateProgress(loadCount.doubleValue(), overlayCount);
-					// log.info("loadCount: " + loadCount + ", " + ((double) loadCount/overlayCount));
 				}
 
 				if (parent != null) {
@@ -989,15 +906,17 @@ public class TokenTool_Controller {
 		};
 
 		overlayTreeProgressBar.progressProperty().bind(task.progressProperty());
-
-		// Only call this once, in this case, the "parent" task
 		overlayTreeProgressBar.progressProperty().addListener(observable -> {
-			Platform.runLater(() -> progressBarLabel.setText("Caching " + Math.round(overlayCount - loadCount.doubleValue()) + "..."));
-
-			if (overlayTreeProgressBar.getProgress() >= 1 && parent == null) {
-				treeViewFinish();
-			}
+			Platform.runLater(() -> progressBarLabel.setText(I18N.getString("TokenTool.treeview.caching") + Math.round(overlayCount - loadCount.doubleValue()) + "..."));
 		});
+
+		// Only add this listener to the parent task so it's only called once
+		if (parent == null) {
+			overlayTreeProgressBar.progressProperty().addListener(observable -> {
+				if (overlayTreeProgressBar.getProgress() >= 1)
+					treeViewFinish();
+			});
+		}
 
 		executorService.execute(task);
 		return root;
@@ -1022,8 +941,110 @@ public class TokenTool_Controller {
 		return tree;
 	}
 
+	/*
+	 * getter/setter methods, mainly for user preferences
+	 */
+	public double getOverlayWidth() {
+		return overlayWidthSpinner.getValue();
+	}
+
+	public void setOverlayWidth(double newValue) {
+		overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
+	}
+
+	public double getOverlayHeight() {
+		return overlayHeightSpinner.getValue();
+	}
+
+	public void setOverlayHeight(double newValue) {
+		overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
+	}
+
+	public boolean getOverlayAspect() {
+		return overlayAspectToggleButton.isSelected();
+	}
+
+	public void setOverlayAspect(boolean selected) {
+		// UI normally starts this toggle as selected == aspect locked
+		if (!selected)
+			overlayAspectToggleButton.fire();
+	}
+
+	public boolean getOverlayUseAsBase() {
+		return overlayUseAsBaseCheckbox.isSelected();
+	}
+
+	public void setOverlayUseAsBase(boolean selected) {
+		if (selected)
+			overlayUseAsBaseCheckbox.fire();
+	}
+
+	public String getFileNameTextField() {
+		return fileNameTextField.getText();
+	}
+
+	public void setFileNameTextField(String text) {
+		fileNameTextField.setText(text);
+	}
+
+	public void updateFileNameTextField(String text) {
+		if (!getUseFileNumberingCheckbox())
+			if (text == null || text.isEmpty())
+				fileNameTextField.setText(AppConstants.DEFAULT_TOKEN_NAME);
+			else
+				fileNameTextField.setText(text);
+	}
+
+	public boolean getUseFileNumberingCheckbox() {
+		return useFileNumberingCheckbox.isSelected();
+	}
+
+	public void setUseFileNumberingCheckbox(boolean selected) {
+		if (selected)
+			useFileNumberingCheckbox.fire();
+	}
+
+	public String getFileNameSuffixTextField() {
+		return fileNameSuffixTextField.getText();
+	}
+
+	public void setFileNameSuffixTextField(String text) {
+		fileNameSuffixTextField.setText(text);
+	}
+
+	public Image getPortraitImage() {
+		return portraitImageView.getImage();
+	}
+
+	public void setPortraitImage(Image newPortraitImage, double x, double y, double r, double s) {
+		updatePortrait(newPortraitImage);
+		portraitImageView.setTranslateX(x);
+		portraitImageView.setTranslateY(y);
+		portraitImageView.setRotate(r);
+		portraitImageView.setScaleX(s);
+		portraitImageView.setScaleY(s);
+	}
+
+	public void updatePortraitLocation(double xDelta, double yDelta) {
+		if (xDelta != 0)
+			portraitImageView.setTranslateX(portraitImageView.getTranslateX() + (xDelta / 2));
+
+		if (yDelta != 0)
+			portraitImageView.setTranslateY(portraitImageView.getTranslateY() + (yDelta / 2));
+	}
+
+	public ImageView getPortraitImageView() {
+		return portraitImageView;
+	}
+
 	public void exitApplication() {
-		AppPreferences.savePreferences(this);
-		Platform.exit();
+		try {
+			AppPreferences.savePreferences(this);
+		} catch (Exception e) {
+			log.error("Error saving preferences!", e);
+		} finally {
+			log.info("Exiting application.");
+			Platform.exit();
+		}
 	}
 }

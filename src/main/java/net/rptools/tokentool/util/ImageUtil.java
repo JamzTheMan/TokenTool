@@ -145,10 +145,17 @@ public class ImageUtil {
 		return thumbView;
 	}
 
+	public static Image resizeCanvas(Image imageSource, double newWidth, double newHeight) {
+		int offsetX = (int) ((newWidth - imageSource.getWidth()) / 2);
+		int offsetY = (int) ((newHeight - imageSource.getHeight()) / 2);
+
+		return resizeCanvas(imageSource, (int) newWidth, (int) newHeight, offsetX, offsetY);
+	}
+
 	/*
 	 * Resize the overall image width/height without scaling the actual image, eg resize the canvas
 	 */
-	private static Image resizeCanvas(Image imageSource, int newWidth, int newHeight, int offsetX, int offsetY) {
+	public static Image resizeCanvas(Image imageSource, int newWidth, int newHeight, int offsetX, int offsetY) {
 		int sourceWidth = (int) imageSource.getWidth();
 		int sourceHeight = (int) imageSource.getHeight();
 
@@ -166,6 +173,17 @@ public class ImageUtil {
 		pixelWriter.setPixels(offsetX, offsetY, sourceWidth, sourceHeight, format, buffer, 0, sourceWidth);
 
 		return outputImage;
+	}
+
+	/*
+	 * Resize the overall image width/height scaled to the target width/height
+	 */
+	public static Image scaleImage(Image source, double targetWidth, double targetHeight, boolean preserveRatio) {
+		ImageView imageView = new ImageView(source);
+		imageView.setPreserveRatio(preserveRatio);
+		imageView.setFitWidth(targetWidth);
+		imageView.setFitHeight(targetHeight);
+		return imageView.snapshot(null, null);
 	}
 
 	/*
@@ -221,6 +239,9 @@ public class ImageUtil {
 				}
 			}
 		}
+
+		if (maxX - minX <= 0 || maxY - minY <= 0)
+			return new WritableImage(1, 1);
 
 		// Create a viewport to clip the image using snapshot
 		Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);

@@ -20,7 +20,7 @@ import net.rptools.tokentool.AppConstants;
 
 public class FileSaveUtil {
 	private static final Logger log = LogManager.getLogger(FileSaveUtil.class);
-	private File lastFile = null; // TODO Move to preferences class?
+	private static File lastFile = null;
 
 	public File getTempFileName(boolean asToken, boolean useNumbering, String tempFileName,
 			TextField fileNameSuffix) throws IOException {
@@ -32,11 +32,7 @@ public class FileSaveUtil {
 			throws IOException {
 		final String _extension;
 
-		// if (asToken) {
-		// _extension = AppConstants.DEFAULT_TOKEN_EXTENSION;
-		// } else {
 		_extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
-		// }
 
 		if (useNumbering) {
 			int dragCounter;
@@ -45,20 +41,21 @@ public class FileSaveUtil {
 			} catch (NumberFormatException e) {
 				dragCounter = 0;
 			}
-			fileNameSuffix.setText(String.format("%04d", dragCounter + 1));
+
+			String leadingZeroes = "%0" + fileNameSuffix.getLength() + "d";
+
+			fileNameSuffix.setText(String.format(leadingZeroes, dragCounter + 1));
 
 			if (tempFileName.isEmpty())
 				tempFileName = AppConstants.DEFAULT_TOKEN_NAME;
 
 			if (lastFile != null) {
-				return new File(lastFile.getParent(), String.format("%s_%04d" + _extension, tempFileName, dragCounter));
+				return new File(lastFile.getParent(), String.format("%s_" + leadingZeroes + _extension, tempFileName, dragCounter));
 			} else {
-				return new File(String.format("%s_%04d" + _extension, tempFileName, dragCounter));
+				return new File(String.format("%s_" + leadingZeroes + _extension, tempFileName, dragCounter));
 			}
 		} else {
 			if (lastFile != null)
-				// tempFileName = FileUtil.getNameWithoutExtension(lastFile);
-
 				if (tempFileName.isEmpty())
 					tempFileName = AppConstants.DEFAULT_TOKEN_NAME + _extension;
 
@@ -74,12 +71,17 @@ public class FileSaveUtil {
 		}
 	}
 
-	public File getLastFile() {
+	public static File getLastFile() {
 		return lastFile;
 	}
 
-	public void setLastFile(File lastFile) {
-		this.lastFile = lastFile;
+	public static void setLastFile(File file) {
+		lastFile = file;
+	}
+
+	public static void setLastFile(String filePath) {
+		if (filePath != null)
+			lastFile = new File(filePath);
 	}
 
 	public static void copyFile(File srcFile, File destDir) {

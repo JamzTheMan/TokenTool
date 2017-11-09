@@ -22,7 +22,7 @@
 					<children>
 						<AnchorPane>
 							<children>
-								<Label alignment="CENTER" style="&#10;" text="Directory" textAlignment="CENTER" wrapText="false">
+								<Label alignment="CENTER" style="&#10;" text="%ManageOverlays.label.Directory" textAlignment="CENTER" wrapText="false">
 									<opaqueInsets>
 										<Insets />
 									</opaqueInsets>
@@ -59,7 +59,7 @@
 						</ScrollPane>
 						<AnchorPane>
 							<children>
-								<Button fx:id="restoreButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#restoreButton_onAction" text="Restore Default Overlays" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+								<Button fx:id="restoreButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#restoreButton_onAction" text="%ManageOverlays.button.Restore_Default_Overlays" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 									<font>
 										<Font size="10.0" />
 									</font>
@@ -72,7 +72,7 @@
 					<children>
 						<AnchorPane>
 							<children>
-								<Label alignment="CENTER" layoutX="5.0" style="&#10;" text="Overlays" textAlignment="CENTER" wrapText="false">
+								<Label alignment="CENTER" layoutX="5.0" style="&#10;" text="%ManageOverlays.label.Overlays" textAlignment="CENTER" wrapText="false">
 									<opaqueInsets>
 										<Insets />
 									</opaqueInsets>
@@ -115,7 +115,7 @@
 				</VBox>
 				<VBox>
 					<children>
-						<Label alignment="CENTER" style="&#10;" text="Details" textAlignment="CENTER" wrapText="false">
+						<Label alignment="CENTER" style="&#10;" text="%ManageOverlays.label.Details" textAlignment="CENTER" wrapText="false">
 							<opaqueInsets>
 								<Insets />
 							</opaqueInsets>
@@ -136,7 +136,7 @@
 										<Font name="System Bold" size="16.0" />
 									</font>
 								</Label>
-								<Label fx:id="overlayDescription" text="Image Type Description" />
+								<Label fx:id="overlayDescription" text="%ManageOverlays.label.Image_Type_Description" />
 								<Label fx:id="overlayDimensions" layoutX="17.0" layoutY="44.0" text="300 x 300" />
 								<ImageView fx:id="overlayLayerImage" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
 									<VBox.margin>
