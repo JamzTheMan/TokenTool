@@ -2,7 +2,7 @@
 ################################################################################
 .gradle
 /gradle.properties
-/gradle/
+/gradle/*
 /gradlew.bat
 /gradlew
 
@@ -20,11 +20,11 @@ Thumbs.db
 # IDEs
 ################################################################################
 *.iml
-.idea/
+.idea/*
 .*.sw[p0-9]
 .sw[p0-9]
 .project
-.settings/
+.settings/*
 .classpath
 .history
 workbench.xmi
@@ -36,9 +36,9 @@ build-resources/rptools-keystore
 ################################################################################
 *.log
 *~
-target/
-build/
-out/
-releases/
-/bin/
-/sentry-events/
+target/*
+build/*
+out/*
+releases/*
+bin/*
+sentry-events/*
