@@ -13,7 +13,7 @@ addons:
     - oracle-java8-installer
     - fakeroot
 script: 
-  - "./gradlew build -x test"
+  - "./gradlew build"
 notifications:
   slack: nerps:JumMHisqOlXac7be25Ca8FbN
 before_cache:
