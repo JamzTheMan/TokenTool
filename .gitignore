@@ -2,7 +2,6 @@
 ################################################################################
 .gradle
 /gradle.properties
-/gradle/*
 /gradlew.bat
 /gradlew
 
