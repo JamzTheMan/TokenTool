@@ -13,7 +13,7 @@ addons:
     - oracle-java8-installer
     - fakeroot
 script: 
-  - "./gradlew build"
+  - ./gradlew build
 notifications:
   slack: nerps:JumMHisqOlXac7be25Ca8FbN
 before_cache:
@@ -24,8 +24,7 @@ cache:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
 before_deploy:
-  script: 
-  - "./gradlew deploy"
+  - ./gradlew deploy
 deploy:
   provider: releases
   api_key:
