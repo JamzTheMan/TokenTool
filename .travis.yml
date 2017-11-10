@@ -24,7 +24,8 @@ cache:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
 before_deploy:
-  script: "./gradlew deploy"
+  script: 
+  - "./gradlew deploy"
 deploy:
   provider: releases
   api_key:
