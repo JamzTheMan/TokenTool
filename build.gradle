@@ -170,7 +170,7 @@ task deploy(dependsOn: uberJar) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-srcfiles", "TokenTool-"+version+".jar",
+				"-srcfiles", "tokentool-"+version+".jar",	// leave lowercase for linux, windows does not care
 				"-outdir", "releases/release-"+version,
 				"-outfile", project.name,
 				"-name", project.name,
