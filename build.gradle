@@ -170,7 +170,8 @@ task deploy(dependsOn: uberJar) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-srcfiles", "tokentool-"+version+".jar",	// leave lowercase for linux, windows does not care
+				"-srcfiles", "TokenTool-"+version+".jar",
+				"-srcfiles", "../../license/COPYING.AFFERO",
 				"-outdir", "releases/release-"+version,
 				"-outfile", project.name,
 				"-name", project.name,
@@ -182,7 +183,11 @@ task deploy(dependsOn: uberJar) {
 				"-Bwin.menuGroup=" + vendor,
 				"-BshortcutHint=true",
 				"-BappVersion=" + version,
-				"-Bwin.msi.productVersion=" + msiVersion
+				"-Bwin.msi.productVersion=" + msiVersion,
+				"-BlicenseFile=../../license/COPYING.AFFERO",
+				"-BlicenseType=GNU AFFERO GENERAL PUBLIC LICENSE",
+				"-Bcategory=Graphics",
+				"-Bemail=tokentool@nerps.net"
 		}
 	}
 }

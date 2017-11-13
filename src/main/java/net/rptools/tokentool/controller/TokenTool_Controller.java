@@ -453,18 +453,20 @@ public class TokenTool_Controller {
 	@FXML
 	void compositeTokenPane_OnScroll(ScrollEvent event) {
 		if (event.isShiftDown()) {
-			Double r = portraitImageView.getRotate() + event.getDeltaX() / 20;
-
+			Double r = portraitImageView.getRotate() + event.getDeltaY() / 20;
+			
 			if (r < -360d || r > 360d)
 				r = 0d;
-
+			
 			portraitImageView.setRotate(r);
 		} else {
 			Double scale = portraitImageView.getScaleY() * Math.pow(1.001, event.getDeltaY());
+
 			portraitImageView.setScaleX(scale);
 			portraitImageView.setScaleY(scale);
 		}
 
+		event.consume();
 		updateTokenPreviewImageView();
 	}
 
