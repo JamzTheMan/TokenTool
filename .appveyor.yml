@@ -4,6 +4,7 @@ pull_requests:
 image: Visual Studio 2017
 platform: x64
 build_script:
+- gradlew.bat spotlessApply
 - gradlew.bat build
 after_test:
 - ps: ls $env:appveyor_build_folder\releases\release-*\bundles\
