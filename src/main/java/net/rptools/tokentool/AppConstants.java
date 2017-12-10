@@ -21,10 +21,13 @@ public class AppConstants {
 
 	public static final String TOKEN_TOOL_BUNDLE = "net.rptools.tokentool.i18n.TokenTool";
 
+	public static final String SPLASH_SCREEN_FXML = "/net/rptools/tokentool/view/SplashScreenLoader.fxml";
 	public static final String TOKEN_TOOL_FXML = "/net/rptools/tokentool/view/TokenTool.fxml";
 	public static final String MANAGE_OVERLAYS_FXML = "/net/rptools/tokentool/view/ManageOverlays.fxml";
 	public static final String REGION_SELECTOR_FXML = "/net/rptools/tokentool/view/RegionSelector.fxml";
 	public static final String CREDITS_FXML = "/net/rptools/tokentool/view/Credits.fxml";
+	public static final String IMAGE_GALLERY_FXML = "/net/rptools/tokentool/view/ImageGallery.fxml";
+	public static final String PDF_VIEW_FXML = "/net/rptools/tokentool/view/PdfView.fxml";
 
 	public static final String RPTOOLS_URL = "http://www.rptools.net";
 

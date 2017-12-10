@@ -127,6 +127,10 @@ public class AppSetup {
 		return home;
 	}
 
+	public static File getTmpDir() {
+		return getAppHome("tmp");
+	}
+
 	/**
 	 * A convenience method to break up the version number string into it's component version identifiers and test if version is newer than existing version
 	 * 

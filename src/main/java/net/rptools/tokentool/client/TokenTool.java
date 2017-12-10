@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
+import javax.imageio.spi.IIORegistry;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -76,6 +78,12 @@ public class TokenTool extends Application {
 
 	@Override
 	public void init() throws Exception {
+		// Since we are using multiple plugins (Twelve Monkeys for PSD and JAI for jpeg2000) in the same uber jar,
+		// the META-INF/services/javax.imageio.spi.ImageReaderSpi gets overwritten. So we need to register them manually:
+		// https://github.com/jai-imageio/jai-imageio-core/issues/29
+		IIORegistry registry = IIORegistry.getDefaultInstance();
+		registry.registerServiceProvider(new com.github.jaiimageio.jpeg2000.impl.J2KImageReaderSpi());
+
 		appInstance = this;
 		VERSION = getVersion();
 

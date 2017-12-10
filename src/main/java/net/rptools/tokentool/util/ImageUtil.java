@@ -9,6 +9,7 @@
 package net.rptools.tokentool.util;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -376,11 +377,23 @@ public class ImageUtil {
 		}
 	}
 
+	public static byte[] imageToBytes(BufferedImage image) throws IOException {
+		return imageToBytes(image, "png");
+	}
+
+	public static byte[] imageToBytes(BufferedImage image, String format) throws IOException {
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream(10000);
+		ImageIO.write(image, format, outStream);
+
+		return outStream.toByteArray();
+	}
+
 	/*
 	 * These are the file types supported by TokenTool
 	 */
 	public static final String[] SUPPORTED_FILE_FILTER_ARRAY = new String[] { ".psd", ".png", ".gif", ".jpg", ".jpeg", ".bmp" };
 	public static final IOFileFilter SUPPORTED_FILE_FILTER = new SuffixFileFilter(SUPPORTED_FILE_FILTER_ARRAY);
+	public static final ExtensionFilter SUPPORTED_PDF_EXTENSION_FILTER = new ExtensionFilter("PDF Files", "*.pdf");
 
 	public static final List<ExtensionFilter> GET_EXTENSION_FILTERS() {
 		List<ExtensionFilter> extensionFilters = new ArrayList<ExtensionFilter>();

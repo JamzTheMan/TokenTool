@@ -41,7 +41,8 @@
 					<menus>
 						<Menu text="%menu.title.file">
 							<items>
-								<MenuItem fx:id="fileManageOverlaysMenu" onAction="#fileManageOverlaysMenu_onAction" text="%menu.title.file.manage.overlays" />
+								<MenuItem fx:id="fileOpenPDF_Menu" onAction="#fileOpenPDF_Menu_onAction" text="%menu.title.file.open.pdf" />
+                        <MenuItem fx:id="fileManageOverlaysMenu1" onAction="#fileManageOverlaysMenu_onAction" text="%menu.title.file.manage.overlays" />
 								<MenuItem fx:id="fileSaveAsMenu" onAction="#fileSaveAsMenu_onAction" text="%menu.title.file.save.as" />
 								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="fileExitMenu" onAction="#fileExitMenu_onAction" text="%menu.title.file.exit" />

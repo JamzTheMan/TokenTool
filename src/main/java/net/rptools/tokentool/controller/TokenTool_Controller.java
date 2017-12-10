@@ -83,17 +83,20 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.client.Credits;
 import net.rptools.tokentool.client.ManageOverlays;
+import net.rptools.tokentool.client.PdfViewer;
 import net.rptools.tokentool.client.RegionSelector;
 import net.rptools.tokentool.util.FileSaveUtil;
 import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
 public class TokenTool_Controller {
+	@FXML private MenuItem fileOpenPDF_Menu;
 	@FXML private MenuItem fileManageOverlaysMenu;
 	@FXML private MenuItem fileSaveAsMenu;
 	@FXML private MenuItem fileExitMenu;
@@ -170,8 +173,6 @@ public class TokenTool_Controller {
 	private Point portraitImageStart = new Point();
 	private FileSaveUtil fileSaveUtil = new FileSaveUtil();
 
-	@SuppressWarnings("unused") private RegionSelector regionSelector;
-
 	// A custom set of Width/Height sizes to use for Overlays
 	private NavigableSet<Double> overlaySpinnerSteps = new TreeSet<Double>(Arrays.asList(50d, 100d, 128d, 150d, 200d,
 			256d, 300d, 400d, 500d, 512d, 600d, 700d, 750d, 800d, 900d, 1000d));
@@ -179,6 +180,7 @@ public class TokenTool_Controller {
 	@FXML
 	void initialize() {
 		// Note: A Pane is added to the compositeTokenPane so the ScrollPane doesn't consume the mouse events
+		assert fileOpenPDF_Menu != null : "fx:id=\"fileOpenPDF_Menu\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileManageOverlaysMenu != null : "fx:id=\"fileManageOverlaysMenu\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileSaveAsMenu != null : "fx:id=\"fileSaveAsMenu\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileExitMenu != null : "fx:id=\"fileExitMenu\" was not injected: check your FXML file 'TokenTool.fxml'.";
@@ -355,9 +357,33 @@ public class TokenTool_Controller {
 	}
 
 	@FXML
+	void fileOpenPDF_Menu_onAction(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(I18N.getString("ImageChooser.filechooser.overlay.title"));
+		fileChooser.getExtensionFilters().add(ImageUtil.SUPPORTED_PDF_EXTENSION_FILTER);
+
+		File lastPdfFile = new File(AppPreferences.getPreference(AppPreferences.LAST_PDF_FILE, ""));
+
+		if (lastPdfFile.exists())
+			fileChooser.setInitialDirectory(lastPdfFile);
+		else if (lastPdfFile.getParentFile() != null)
+			fileChooser.setInitialDirectory(lastPdfFile.getParentFile());
+
+		File selectedPDF = fileChooser.showOpenDialog((Stage) compositeGroup.getScene().getWindow());
+
+		if (selectedPDF != null) {
+			try {
+				new PdfViewer(selectedPDF, this);
+				AppPreferences.setPreference(AppPreferences.LAST_PDF_FILE, selectedPDF.getParentFile().getCanonicalPath());
+			} catch (IOException e) {
+				log.error("Error loading PDF " + selectedPDF.getAbsolutePath());
+			}
+		}
+	}
+
+	@FXML
 	void fileManageOverlaysMenu_onAction(ActionEvent event) {
-		@SuppressWarnings("unused")
-		ManageOverlays manageOverlays = new ManageOverlays(this);
+		new ManageOverlays(this);
 	}
 
 	@FXML
@@ -372,7 +398,7 @@ public class TokenTool_Controller {
 
 	@FXML
 	void editCaptureScreenMenu_onAction(ActionEvent event) {
-		regionSelector = new RegionSelector(this);
+		new RegionSelector(this);
 	}
 
 	@FXML

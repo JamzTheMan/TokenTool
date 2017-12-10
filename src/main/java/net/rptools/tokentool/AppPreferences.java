@@ -43,7 +43,7 @@ public class AppPreferences {
 	private static final String BACKGROUND_COLOR_BLUE = "backgroundColor_BLUE";
 	private static final String BACKGROUND_COLOR_GREEN = "backgroundColor_GREEN";
 	private static final String BACKGROUND_COLOR_ALPHA = "backgroundColor_ALPHA";
-	private static final String LAST_FILE = "lastFileSaved";
+	private static final String LAST_TOKEN_FILE = "lastFileSaved";
 	private static final String LAST_PORTRAIT_FILE = "lastPortrait";
 	private static final String FILE_NAME_TEXT_FIELD = "fileNameTextField";
 	private static final String FILE_NAME_SUFFIX_TEXT_FIELD = "fileNameSuffixTextField";
@@ -58,6 +58,40 @@ public class AppPreferences {
 	private static final String WINDOW_Y = "window_y";
 	private static final String WINDOW_WIDTH = "window_width";
 	private static final String WINDOW_HEIGHT = "window_height";
+
+	public static final String LAST_PDF_FILE = "lastPdfFileSaved";
+
+	public static void setPreference(String preference, String value) {
+		prefs.put(preference, value);
+	}
+
+	public static void setPreference(String preference, boolean value) {
+		prefs.putBoolean(preference, value);
+	}
+
+	public static void setPreference(String preference, int value) {
+		prefs.putInt(preference, value);
+	}
+
+	public static void setPreference(String preference, double value) {
+		prefs.putDouble(preference, value);
+	}
+
+	public static String getPreference(String preference, String defaultVal) {
+		return prefs.get(preference, defaultVal);
+	}
+
+	public static boolean getPreference(String preference, boolean defaultVal) {
+		return prefs.getBoolean(preference, defaultVal);
+	}
+
+	public static int getPreference(String preference, int defaultVal) {
+		return prefs.getInt(preference, defaultVal);
+	}
+
+	public static double getPreference(String preference, double devaultVal) {
+		return prefs.getDouble(preference, devaultVal);
+	}
 
 	public static void savePreferences(TokenTool_Controller tokentool_Controller) {
 		log.info("Saving preferences...");
@@ -95,7 +129,7 @@ public class AppPreferences {
 		try {
 			if (FileSaveUtil.getLastFile() != null)
 				if (FileSaveUtil.getLastFile().getParentFile().exists())
-					prefs.put(LAST_FILE, FileSaveUtil.getLastFile().getCanonicalPath());
+					prefs.put(LAST_TOKEN_FILE, FileSaveUtil.getLastFile().getCanonicalPath());
 		} catch (IOException e) {
 			log.error("Error saving last file preference.", e);
 		}
@@ -175,7 +209,7 @@ public class AppPreferences {
 			TokenTool.getInstance().getStage().setHeight(window_height);
 
 		// Restore location of save
-		FileSaveUtil.setLastFile(prefs.get(LAST_FILE, null));
+		FileSaveUtil.setLastFile(prefs.get(LAST_TOKEN_FILE, null));
 
 		// Restore last portrait used
 		String lastPortraitPath = prefs.get(LAST_PORTRAIT_FILE, null);

@@ -23,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import net.rptools.tokentool.AppConstants;
 
 public class RegionSelector_Controller {
 	private static final Logger log = LogManager.getLogger(RegionSelector_Controller.class);
@@ -33,8 +34,8 @@ public class RegionSelector_Controller {
 
 	@FXML
 	void initialize() {
-		assert selectionStackPane != null : "fx:id=\"selectionStackPane\" was not injected: check your FXML file 'RegionSelector.fxml'.";
-		assert captureButton != null : "fx:id=\"captureButton\" was not injected: check your FXML file 'RegionSelector.fxml'.";
+		assert selectionStackPane != null : "fx:id=\"selectionStackPane\" was not injected: check your FXML file '" + AppConstants.REGION_SELECTOR_FXML + "'.";
+		assert captureButton != null : "fx:id=\"captureButton\" was not injected: check your FXML file '" + AppConstants.REGION_SELECTOR_FXML + "'.";
 	}
 
 	@FXML
