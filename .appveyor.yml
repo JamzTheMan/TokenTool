@@ -3,6 +3,10 @@ pull_requests:
   do_not_increment_build_number: true
 image: Visual Studio 2017
 platform: x64
+install:
+  - cinst jdk9 -params 'installdir=C:\\jdk9'
+  - SET JAVA_HOME=C:\jdk9
+  - SET PATH=C:\jdk9\bin;%PATH%
 before_build:
 - gradlew.bat spotlessApply
 build_script:
