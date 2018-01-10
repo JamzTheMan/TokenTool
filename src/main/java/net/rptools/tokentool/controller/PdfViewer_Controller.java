@@ -28,7 +28,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.model.PdfModel;
 
@@ -39,11 +38,11 @@ public class PdfViewer_Controller implements Initializable {
 	@FXML private AnchorPane pdfAnchorPane;
 	@FXML private Pagination pdfViewPagination;
 	@FXML private TextField pageNumberTextField;
-	
+
 	private PdfModel model;
 	private ImageGallery_Controller imageGalleryController;
 	private ImageView pdfImageView;
-	
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		assert pdfViewSplitPane != null : "fx:id=\"pdfViewSplitPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
@@ -73,7 +72,7 @@ public class PdfViewer_Controller implements Initializable {
 			imageGalleryController = fxmlLoader.<ImageGallery_Controller> getController();
 
 			pdfViewSplitPane.getItems().add(imageGallery);
-			
+
 			SplitPane.setResizableWithParent(imageGallery, Boolean.FALSE);
 		} catch (IOException e) {
 			log.error("IO Error in pdfViewer extractImages().", e);
@@ -86,7 +85,7 @@ public class PdfViewer_Controller implements Initializable {
 
 		return pdfImageView;
 	}
-	
+
 	private void extractImages() {
 		imageGalleryController.getImageGallery().getChildren().clear();
 		model.extractImages(imageGalleryController.getImageGallery(), pdfViewPagination.getCurrentPageIndex());

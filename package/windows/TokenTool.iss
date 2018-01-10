@@ -7,7 +7,7 @@ AppVersion=2.1
 AppVerName=TokenTool 2.1
 AppPublisher=Nerps
 AppComments=TokenTool by Nerps
-AppCopyright=Copyright (C) 2017
+AppCopyright=Copyright (C) 2018
 AppPublisherURL=http://tokentool.nerps.net/
 AppSupportURL=http://forums.rptools.net/viewtopic.php?f=60&t=23681
 ;AppUpdatesURL=http://java.com/
@@ -27,7 +27,7 @@ OutputBaseFilename=TokenTool-2.1
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
-SetupIconFile=TokenTool/TokenTool.ico
+SetupIconFile=D:\Development\git\JamzTheMan\TokenTool/package/windows/TokenTool.ico
 UninstallDisplayIcon={app}/TokenTool.ico
 UninstallDisplayName=TokenTool
 WizardImageStretch=Yes
@@ -42,7 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "TokenTool/TokenTool.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "TokenTool/*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: D:\Development\git\JamzTheMan\TokenTool/package/windows/msvcr100.dll; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: D:\Development\git\JamzTheMan\TokenTool/package/windows/msvcr100.dll; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\TokenTool"; Filename: "{app}/TokenTool.exe"; IconFilename: "{app}/TokenTool.ico"; Check: returnTrue()

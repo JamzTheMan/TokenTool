@@ -7,7 +7,7 @@ import org.gradle.plugins.ide.eclipse.model.AccessRule
 
 buildscript {
 	dependencies {
-		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.7.0"
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.8.0"
 	}
 
 	repositories {
@@ -25,8 +25,8 @@ apply plugin: 'com.diffplug.gradle.spotless'
 
 // Definitions
 defaultTasks 'clean', 'build'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 // Don't fail build if tests fail until tests are cleaned up
 test.ignoreFailures = true
@@ -58,7 +58,7 @@ spotless {
 	java {
 		licenseHeaderFile	'spotless.license.java'
 		eclipse().configFile('build-resources/eclipse.prefs.formatter.xml')
-		removeUnusedImports()
+		// removeUnusedImports() // Not working with Java 9
 	}
 
 	format 'misc', {
@@ -176,6 +176,7 @@ task prepareInnoSetup(type: Copy) {
 		AppName: "${project.name}",
 		AppVersion: "${version}",
 		Vendor: "${vendor}",
+		SetupIcon: "${project.projectDir.absolutePath}/package/windows/${project.name}.ico",
 		WizardImage: "${project.projectDir.absolutePath}/package/windows/${project.name}-setup.bmp",
 		InstallDLL: "${project.projectDir.absolutePath}/package/windows/msvcr100.dll",
 		Slash: "\\",
@@ -205,13 +206,13 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-srcfiles", jar.archiveName,
-				"-srcfiles", "COPYING.AFFERO",
 				"-outdir", "releases/release-"+version,
 				"-outfile", project.name,
 				"-name", project.name,
+				"-description", project.name + " " + version + " by " + vendor,
 				"-title", project.name,
 				"-vendor", vendor,
+				"-BdropinResourcesRoot=.",
 				"-BinstalldirChooser=true",
 				"-BsystemWide=false",
 				"-BmenuHint=true",
@@ -225,4 +226,8 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 				"-Bemail=tokentool@nerps.net"
 		}
 	}
+}
+
+task wrapper(type: Wrapper) {
+gradleVersion = '4.4.1'
 }

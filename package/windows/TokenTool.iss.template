@@ -7,7 +7,7 @@ AppVersion=${AppVersion}
 AppVerName=${AppName} ${AppVersion}
 AppPublisher=${Vendor}
 AppComments=${AppName} by ${Vendor}
-AppCopyright=Copyright (C) 2017
+AppCopyright=Copyright (C) 2018
 AppPublisherURL=http://tokentool.nerps.net/
 AppSupportURL=http://forums.rptools.net/viewtopic.php?f=60&t=23681
 ;AppUpdatesURL=http://java.com/
@@ -27,7 +27,7 @@ OutputBaseFilename=${AppName}-${AppVersion}
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=lowest
-SetupIconFile=${AppName}/${AppName}.ico
+SetupIconFile=${SetupIcon}
 UninstallDisplayIcon={app}/${AppName}.ico
 UninstallDisplayName=${AppName}
 WizardImageStretch=Yes
@@ -42,7 +42,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "TokenTool/TokenTool.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "TokenTool/*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ${InstallDLL}; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+;Source: ${InstallDLL}; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}${Slash}TokenTool"; Filename: "{app}/TokenTool.exe"; IconFilename: "{app}/TokenTool.ico"; Check: returnTrue()
