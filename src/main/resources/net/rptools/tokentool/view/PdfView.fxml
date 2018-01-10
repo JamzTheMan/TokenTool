@@ -5,16 +5,14 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane fx:id="pdfViewSplitPane" prefHeight="815.0" prefWidth="600.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.PdfViewer_Controller">
+<SplitPane fx:id="pdfViewSplitPane" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.PdfViewer_Controller">
 	<items>
       <AnchorPane fx:id="pdfAnchorPane" SplitPane.resizableWithParent="false">
          <children>
-            <ImageView fx:id="pdfImageView" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       		<Pagination fx:id="pdfViewPagination" maxPageIndicatorCount="20" onMouseClicked="#pdfViewPagination_onMouseClick" onScroll="#pdfViewPagination_OnScroll" stylesheets="@../css/TokenTool.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -25,7 +23,7 @@
             </Pagination>
             <BorderPane layoutX="10.0" layoutY="788.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <center>
-                  <TextField fx:id="pageNumberTextField" alignment="CENTER" maxWidth="75.0" onAction="#pageNumberTextField_onAction" onMouseClicked="#pageNumberTextField_onMouseClicked" opacity="0.0" style="-fx-background-color: black; -fx-text-fill: white;" BorderPane.alignment="CENTER">
+                  <TextField fx:id="pageNumberTextField" alignment="CENTER" maxWidth="75.0" onAction="#pageNumberTextField_onAction" onMouseClicked="#pageNumberTextField_onMouseClicked" opacity="0.0" style="-fx-background-color: black; -fx-text-fill: white;" text="1" BorderPane.alignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>

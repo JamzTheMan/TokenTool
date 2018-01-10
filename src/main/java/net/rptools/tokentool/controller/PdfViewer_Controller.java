@@ -27,6 +27,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.model.PdfModel;
 
@@ -34,21 +36,25 @@ public class PdfViewer_Controller implements Initializable {
 	private static final Logger log = LogManager.getLogger(PdfViewer_Controller.class);
 
 	@FXML private SplitPane pdfViewSplitPane;
+	@FXML private AnchorPane pdfAnchorPane;
 	@FXML private Pagination pdfViewPagination;
-	@FXML private ImageView pdfImageView;
 	@FXML private TextField pageNumberTextField;
-
+	
 	private PdfModel model;
 	private ImageGallery_Controller imageGalleryController;
-
+	private ImageView pdfImageView;
+	
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		assert pdfViewSplitPane != null : "fx:id=\"pdfViewSplitPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert pdfAnchorPane != null : "fx:id=\"pdfAnchorPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pdfViewPagination != null : "fx:id=\"pdfViewPagination\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
-		assert pdfImageView != null : "fx:id=\"pdfViewPagination\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pageNumberTextField != null : "fx:id=\"pageNumberTextField\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 
 		pdfImageView = new ImageView();
+		pdfImageView.fitWidthProperty().bind(pdfViewSplitPane.widthProperty());
+		pdfImageView.fitHeightProperty().bind(pdfViewSplitPane.heightProperty());
+		pdfImageView.setPreserveRatio(true);
 	}
 
 	public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller) {
@@ -67,18 +73,20 @@ public class PdfViewer_Controller implements Initializable {
 			imageGalleryController = fxmlLoader.<ImageGallery_Controller> getController();
 
 			pdfViewSplitPane.getItems().add(imageGallery);
+			
+			SplitPane.setResizableWithParent(imageGallery, Boolean.FALSE);
 		} catch (IOException e) {
 			log.error("IO Error in pdfViewer extractImages().", e);
 		}
 	}
 
-	private ImageView setPageView(int index) {
-		pdfImageView.setImage(model.getImage(index));
+	private ImageView setPageView(int pageIndex) {
+		pdfImageView.setImage(model.getImage(pageIndex));
 		extractImages();
 
 		return pdfImageView;
 	}
-
+	
 	private void extractImages() {
 		imageGalleryController.getImageGallery().getChildren().clear();
 		model.extractImages(imageGalleryController.getImageGallery(), pdfViewPagination.getCurrentPageIndex());
