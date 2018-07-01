@@ -48,10 +48,10 @@ public class PdfViewer {
 			}
 		});
 
-		pdfViewerController.loadPDF(selectedPDF, tokenTool_Controller);
 		stage.show();
+		pdfViewerController.loadPDF(selectedPDF, tokenTool_Controller, stage);
 
 		// Adjusts for tile pane images after loading PDF which adjusts width
-		stage.setWidth(stage.getWidth() + 215);
+		// stage.setWidth(stage.getWidth() + 215);
 	}
 }

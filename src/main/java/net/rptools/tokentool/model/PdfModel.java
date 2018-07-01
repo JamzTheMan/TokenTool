@@ -13,6 +13,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.layout.TilePane;
@@ -21,9 +24,10 @@ import net.rptools.tokentool.util.ExtractImagesFromPDF;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+
+import com.twelvemonkeys.io.FileUtil;
 
 public class PdfModel {
 	private static final Logger log = LogManager.getLogger(PdfModel.class);
@@ -34,11 +38,15 @@ public class PdfModel {
 
 	private int DPI = Toolkit.getDefaultToolkit().getScreenResolution();
 
+	private Map<Integer, Image> pageCache = new HashMap<Integer, Image>();
+
 	public PdfModel(File pdfFile, TokenTool_Controller tokenTool_Controller) throws IOException {
 		try {
-			document = PDDocument.load(pdfFile, MemoryUsageSetting.setupTempFileOnly());
+			// document = PDDocument.load(pdfFile, MemoryUsageSetting.setupTempFileOnly());
+			document = PDDocument.load(pdfFile);
+
 			renderer = new PDFRenderer(document);
-			imageExtractor = new ExtractImagesFromPDF(document, tokenTool_Controller);
+			imageExtractor = new ExtractImagesFromPDF(document, FileUtil.getBasename(pdfFile), tokenTool_Controller);
 		} catch (IOException ex) {
 			throw new UncheckedIOException("PDDocument throws IOException file=" + pdfFile.getAbsolutePath(), ex);
 		}
@@ -51,13 +59,20 @@ public class PdfModel {
 	}
 
 	public Image getImage(int pageNumber) {
-		BufferedImage pageImage;
+		if (pageCache.containsKey(pageNumber))
+			return pageCache.get(pageNumber);
+
+		BufferedImage pageBufferedImage;
 		try {
-			pageImage = renderer.renderImageWithDPI(pageNumber, DPI);
+			pageBufferedImage = renderer.renderImageWithDPI(pageNumber, DPI);
 		} catch (IOException ex) {
 			throw new UncheckedIOException("PDFRenderer throws IOException", ex);
 		}
-		return SwingFXUtils.toFXImage(pageImage, null);
+
+		Image pageImage = SwingFXUtils.toFXImage(pageBufferedImage, null);
+		pageCache.put(pageNumber, pageImage);
+
+		return pageCache.get(pageNumber);
 	}
 
 	public void close() {

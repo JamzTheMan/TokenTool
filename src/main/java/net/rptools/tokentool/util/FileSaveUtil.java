@@ -31,11 +31,18 @@ public class FileSaveUtil {
 		return new File(System.getProperty("java.io.tmpdir"), getFileName(asToken, useNumbering, tempFileName, fileNameSuffix).getName());
 	}
 
+	public File getTempFileName(String tempFileName) throws IOException {
+		final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+
+		if (!tempFileName.endsWith(_extension))
+			tempFileName += _extension;
+
+		return new File(System.getProperty("java.io.tmpdir"), tempFileName);
+	}
+
 	public File getFileName(boolean asToken, boolean useNumbering, String tempFileName, TextField fileNameSuffix)
 			throws IOException {
-		final String _extension;
-
-		_extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
+		final String _extension = AppConstants.DEFAULT_IMAGE_EXTENSION;
 
 		if (useNumbering) {
 			int dragCounter;

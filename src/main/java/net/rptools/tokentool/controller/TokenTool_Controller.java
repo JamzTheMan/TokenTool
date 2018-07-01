@@ -359,7 +359,7 @@ public class TokenTool_Controller {
 	@FXML
 	void fileOpenPDF_Menu_onAction(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(I18N.getString("ImageChooser.filechooser.overlay.title"));
+		fileChooser.setTitle(I18N.getString("TokenTool.openPDF.filechooser.title"));
 		fileChooser.getExtensionFilters().add(ImageUtil.SUPPORTED_PDF_EXTENSION_FILTER);
 
 		File lastPdfFile = new File(AppPreferences.getPreference(AppPreferences.LAST_PDF_FILE, ""));

@@ -8,11 +8,14 @@
  */
 package net.rptools.tokentool.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSStream;
@@ -23,7 +26,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
-
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 
@@ -31,9 +33,12 @@ import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.TilePane;
-import net.rptools.tokentool.controller.ImageGallery_Controller;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 
 import org.apache.logging.log4j.LogManager;
@@ -47,29 +52,35 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public final class ExtractImagesFromPDF {
-	private static final Logger log = LogManager.getLogger(ImageGallery_Controller.class);
+	private static final Logger log = LogManager.getLogger(ExtractImagesFromPDF.class);
 
 	private final PDDocument document;
 
 	private final Set<COSStream> imageTracker = new HashSet<COSStream>();
 
-	private final static int imageViewSize = 150;
+	private final static int imageViewSize = 175;
 	private final static int imageButtonSize = 200;
 
 	private TokenTool_Controller tokenTool_Controller;
 	private TilePane imageTilePane;
+	private int currentPageNumber;
+	private String pdfName;
 
-	public ExtractImagesFromPDF(PDDocument document, TokenTool_Controller tokenTool_Controller) {
+	private FileSaveUtil fileSaveUtil = new FileSaveUtil();
+
+	public ExtractImagesFromPDF(PDDocument document, String pdfName, TokenTool_Controller tokenTool_Controller) {
 		this.tokenTool_Controller = tokenTool_Controller;
 		this.document = document;
+		this.pdfName = pdfName;
 	}
 
 	public void addImages(TilePane imageTilePane, int pageNumber) throws IOException {
 		imageTracker.clear();
 		this.imageTilePane = imageTilePane;
+		this.currentPageNumber = pageNumber;
 
-		getImagesFromResources(document.getPage(pageNumber).getResources());
 		extractAnnotationImages(document.getPage(pageNumber));
+		getImagesFromResources(document.getPage(pageNumber).getResources());
 	}
 
 	private void getImagesFromResources(PDResources resources) throws IOException {
@@ -89,31 +100,12 @@ public final class ExtractImagesFromPDF {
 			if (xObject instanceof PDFormXObject) {
 				getImagesFromResources(((PDFormXObject) xObject).getResources());
 			} else if (xObject instanceof PDImageXObject) {
-				// log.info("Extracting image... " + xObjectName.getName());
-
 				if (!imageTracker.contains(xObject.getCOSObject())) {
 					imageTracker.add(xObject.getCOSObject());
+					String name = pdfName + " - pg " + currentPageNumber + " - " + xObjectName.getName();
+					log.debug("Extracting image... " + name);
 
-					ToggleButton imageButton = new ToggleButton();
-					ImageView imageViewNode = new ImageView(SwingFXUtils.toFXImage(((PDImageXObject) xObject).getImage(), null));
-					imageViewNode.setFitWidth(imageViewSize);
-					imageViewNode.setFitHeight(imageViewSize);
-					imageButton.setPrefWidth(imageButtonSize);
-					imageButton.setPrefHeight(imageButtonSize);
-					imageViewNode.setPreserveRatio(true);
-
-					imageButton.getStyleClass().add("overlay-toggle-button");
-					imageButton.setGraphic(imageViewNode);
-
-					imageButton.addEventHandler(ActionEvent.ACTION, event -> {
-						imageButton.setSelected(true);
-
-						tokenTool_Controller.updatePortrait(imageViewNode.getImage());
-						event.consume();
-					});
-
-					// Finally, add it to the tile pane!
-					Platform.runLater(() -> imageTilePane.getChildren().add(imageButton));
+					addTileButton(SwingFXUtils.toFXImage(((PDImageXObject) xObject).getImage(), null), name);
 				}
 			}
 		}
@@ -146,7 +138,7 @@ public final class ExtractImagesFromPDF {
 		extractAnnotationImages(appearance.getRolloverAppearance());
 	}
 
-	public void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
+	private void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
 		PDResources resources = appearance.getAppearanceStream().getResources();
 		if (resources == null)
 			return;
@@ -161,7 +153,7 @@ public final class ExtractImagesFromPDF {
 		}
 	}
 
-	public void extractAnnotationImages(PDFormXObject form) throws IOException {
+	private void extractAnnotationImages(PDFormXObject form) throws IOException {
 		PDResources resources = form.getResources();
 		if (resources == null)
 			return;
@@ -176,33 +168,63 @@ public final class ExtractImagesFromPDF {
 		}
 	}
 
-	public void extractAnnotationImages(PDImageXObject xObject) throws IOException {
-		log.info("Extracting Annotations, eg button images...");
-
+	private void extractAnnotationImages(PDImageXObject xObject) throws IOException {
 		if (!imageTracker.contains(xObject.getCOSObject())) {
+
+			String name = pdfName + " - pg " + currentPageNumber + " - img " + imageTracker.size();
+
+			log.debug("Extracting Annotation, eg button image... " + name);
+
 			imageTracker.add(xObject.getCOSObject());
-
-			ToggleButton imageButton = new ToggleButton();
-			ImageView imageViewNode = new ImageView(SwingFXUtils.toFXImage(xObject.getImage(), null));
-			imageViewNode.setFitWidth(imageViewSize);
-			imageViewNode.setFitHeight(imageViewSize);
-			imageButton.setPrefWidth(imageButtonSize);
-			imageButton.setPrefHeight(imageButtonSize);
-			imageViewNode.setPreserveRatio(true);
-
-			imageButton.getStyleClass().add("overlay-toggle-button");
-			imageButton.setGraphic(imageViewNode);
-
-			imageButton.addEventHandler(ActionEvent.ACTION, event -> {
-				imageButton.setSelected(true);
-
-				tokenTool_Controller.updatePortrait(imageViewNode.getImage());
-				event.consume();
-			});
-
-			// Finally, add it to the tile pane!
-			Platform.runLater(() -> imageTilePane.getChildren().add(imageButton));
+			addTileButton(SwingFXUtils.toFXImage(xObject.getImage(), null), name);
 		}
 	}
 
+	private void addTileButton(Image buttonImage, String imageName) {
+		ToggleButton imageButton = new ToggleButton();
+		ImageView imageViewNode = new ImageView(buttonImage);
+		imageViewNode.setFitWidth(imageViewSize);
+		imageViewNode.setFitHeight(imageViewSize);
+		imageButton.setPrefWidth(imageButtonSize);
+		imageButton.setPrefHeight(imageButtonSize);
+		imageViewNode.setPreserveRatio(true);
+
+		imageButton.getStyleClass().add("overlay-toggle-button");
+		imageButton.setGraphic(imageViewNode);
+
+		// just clicking button will update Portrait image...
+		imageButton.addEventHandler(ActionEvent.ACTION, event -> {
+			imageButton.setSelected(true);
+
+			tokenTool_Controller.updatePortrait(imageViewNode.getImage());
+			event.consume();
+		});
+
+		// Can also drag image to tokentool panel OR any other place, like MapTool!
+		imageButton.setOnDragDetected(event -> {
+			Dragboard db = imageButton.startDragAndDrop(TransferMode.ANY);
+			ClipboardContent content = new ClipboardContent();
+
+			try {
+				File tempImageFile;
+				tempImageFile = fileSaveUtil.getTempFileName(imageName);
+
+				ImageIO.write(SwingFXUtils.fromFXImage(buttonImage, null), "png", tempImageFile);
+				content.putFiles(java.util.Collections.singletonList(tempImageFile));
+				tempImageFile.deleteOnExit();
+			} catch (IOException e) {
+				log.error("Unable to write token to file: " + imageName, e);
+			} catch (Exception e) {
+				log.error(e);
+			} finally {
+				content.putImage(buttonImage);
+				db.setContent(content);
+				event.consume();
+			}
+			event.consume();
+		});
+
+		// Finally, add it to the tile pane!
+		Platform.runLater(() -> imageTilePane.getChildren().add(imageButton));
+	}
 }

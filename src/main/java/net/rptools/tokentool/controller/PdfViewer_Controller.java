@@ -12,87 +12,167 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.Duration;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.model.PdfModel;
 
 public class PdfViewer_Controller implements Initializable {
 	private static final Logger log = LogManager.getLogger(PdfViewer_Controller.class);
 
-	@FXML private SplitPane pdfViewSplitPane;
 	@FXML private AnchorPane pdfAnchorPane;
 	@FXML private Pagination pdfViewPagination;
 	@FXML private TextField pageNumberTextField;
+	@FXML private ScrollPane imageScrollPane;
+	@FXML private TilePane imageTilePane;
+	@FXML private ProgressIndicator pdfProgressIndicator;
+	@FXML private Pane viewPortPane;
+	@FXML private ScrollPane imageTileScrollpane;
 
-	private PdfModel model;
-	private ImageGallery_Controller imageGalleryController;
-	private ImageView pdfImageView;
+	private PdfModel pdfModel;
+	private ImageView pdfImageView = new ImageView();
+	private ExecutorService renderPdfPageService;
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		assert pdfViewSplitPane != null : "fx:id=\"pdfViewSplitPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pdfAnchorPane != null : "fx:id=\"pdfAnchorPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pdfViewPagination != null : "fx:id=\"pdfViewPagination\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pageNumberTextField != null : "fx:id=\"pageNumberTextField\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert imageScrollPane != null : "fx:id=\"imageScrollPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert imageTilePane != null : "fx:id=\"imageFlowPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert pdfProgressIndicator != null : "fx:id=\"pdfProgressIndicator\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert viewPortPane != null : "fx:id=\"viewPortPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert imageTileScrollpane != null : "fx:id=\"imageTileScrollpane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 
-		pdfImageView = new ImageView();
-		pdfImageView.fitWidthProperty().bind(pdfViewSplitPane.widthProperty());
-		pdfImageView.fitHeightProperty().bind(pdfViewSplitPane.heightProperty());
-		pdfImageView.setPreserveRatio(true);
+		pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+		renderPdfPageService = Executors.newSingleThreadExecutor();
 	}
 
-	public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller) {
+	public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller, Stage stage) {
 		try {
-			model = new PdfModel(pdfFile, tokenTool_Controller);
+			pdfModel = new PdfModel(pdfFile, tokenTool_Controller);
 		} catch (IOException e) {
 			log.error("Error loading PDF " + pdfFile.getAbsolutePath(), e);
 		}
 
-		pdfViewPagination.setPageCount(model.numPages());
-		pdfViewPagination.setPageFactory(index -> setPageView(index));
+		pdfViewPagination.setPageCount(pdfModel.numPages());
 
-		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.IMAGE_GALLERY_FXML));
-			ScrollPane imageGallery = fxmlLoader.load();
-			imageGalleryController = fxmlLoader.<ImageGallery_Controller> getController();
+		// Set paginations's image to resize with the window. Note: Had to use stage because binding to other panes caused "weirdness"
+		// ...adjusting the height to account for the pagination buttons (didn't care to see them over the PDF image)
+		// ...adjusting the width to account for tiles + scrollbar
+		pdfImageView.setPreserveRatio(true);
+		pdfImageView.setTranslateY(-7);
+		pdfImageView.fitHeightProperty().bind(Bindings.subtract(stage.heightProperty(), 120));
+		pdfImageView.fitWidthProperty().bind(Bindings.subtract(stage.widthProperty(), imageTileScrollpane.getWidth() + 30));
 
-			pdfViewSplitPane.getItems().add(imageGallery);
+		pdfViewPagination.setPageFactory(new Callback<Integer, Node>() {
+			public Node call(final Integer pageIndex) {
+				// First, blank the page out
+				pdfImageView.setImage(null);
 
-			SplitPane.setResizableWithParent(imageGallery, Boolean.FALSE);
-		} catch (IOException e) {
-			log.error("IO Error in pdfViewer extractImages().", e);
+				// Execute the render off the UI thread...
+				RenderPdfPageTask renderPdfPageTask = new RenderPdfPageTask(pageIndex);
+				renderPdfPageService.execute(renderPdfPageTask);
+
+				return pdfImageView;
+			}
+		});
+	}
+
+	private class RenderPdfPageTask extends Task<Void> {
+		Integer pageIndex;
+
+		RenderPdfPageTask(Integer pageIndex) {
+			this.pageIndex = pageIndex;
+		}
+
+		@Override
+		protected Void call() throws Exception {
+			// For debugging and tracking the thread...
+			Thread.currentThread().setName("RenderPdfPageTask-Page-" + (pageIndex + 1));
+
+			long startTime = System.currentTimeMillis();
+
+			pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+			pdfProgressIndicator.setVisible(true);
+			pdfProgressIndicator.setOpacity(1);
+
+			// Do the actual work
+			Image image = pdfModel.getImage(pageIndex);
+
+			// Only show the last page requested otherwise could be confusing when page doesn't match pagination index
+			// Look into killing other tasks?
+			if (pdfViewPagination.getCurrentPageIndex() == pageIndex) {
+
+				// once operation is finished we update UI with results
+				Platform.runLater(() -> {
+					pdfImageView.setImage(image);
+
+					long loadTime = System.currentTimeMillis() - startTime;
+					if (loadTime < 500)
+						pdfProgressIndicator.setVisible(false);
+					else {
+						pdfProgressIndicator.setVisible(true);
+
+						FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), pdfProgressIndicator);
+						fadeTransition.setFromValue(1.0);
+						fadeTransition.setToValue(0.0);
+						fadeTransition.play();
+					}
+				});
+			}
+			return null;
 		}
 	}
 
-	private ImageView setPageView(int pageIndex) {
-		pdfImageView.setImage(model.getImage(pageIndex));
-		extractImages();
+	class getPageImageView extends Task<Node> {
+		Integer pageIndex;
 
-		return pdfImageView;
+		getPageImageView(Integer pageIndex) {
+			this.pageIndex = pageIndex;
+		}
+
+		@Override
+		protected Node call() throws Exception {
+
+			return null;
+		}
 	}
 
 	private void extractImages() {
-		imageGalleryController.getImageGallery().getChildren().clear();
-		model.extractImages(imageGalleryController.getImageGallery(), pdfViewPagination.getCurrentPageIndex());
+		imageTilePane.getChildren().clear();
+		pdfModel.extractImages(imageTilePane, pdfViewPagination.getCurrentPageIndex());
 	}
 
 	public void close() {
-		model.close();
+		pdfModel.close();
+		renderPdfPageService.shutdownNow();
 	}
 
 	@FXML
@@ -102,6 +182,7 @@ public class PdfViewer_Controller implements Initializable {
 			delta = -1;
 
 		pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex() + delta);
+		// Platform.runLater(() -> extractImages());
 	}
 
 	@FXML
@@ -112,12 +193,12 @@ public class PdfViewer_Controller implements Initializable {
 	@FXML
 	void pageNumberTextField_onMouseClicked(MouseEvent event) {
 		pageNumberTextField.setOpacity(1);
+		pageNumberTextField.selectAll();
 	}
 
 	@FXML
 	void pageNumberTextField_onAction(ActionEvent event) {
 		int pageNumber = Integer.parseInt(pageNumberTextField.getText());
-		log.info("Got some action! " + event.getEventType() + " :: " + pageNumber);
 
 		if (pageNumber > pdfViewPagination.getPageCount())
 			pageNumber = pdfViewPagination.getPageCount();

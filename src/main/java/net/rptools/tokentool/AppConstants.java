@@ -26,7 +26,6 @@ public class AppConstants {
 	public static final String MANAGE_OVERLAYS_FXML = "/net/rptools/tokentool/view/ManageOverlays.fxml";
 	public static final String REGION_SELECTOR_FXML = "/net/rptools/tokentool/view/RegionSelector.fxml";
 	public static final String CREDITS_FXML = "/net/rptools/tokentool/view/Credits.fxml";
-	public static final String IMAGE_GALLERY_FXML = "/net/rptools/tokentool/view/ImageGallery.fxml";
 	public static final String PDF_VIEW_FXML = "/net/rptools/tokentool/view/PdfView.fxml";
 
 	public static final String RPTOOLS_URL = "http://www.rptools.net";
