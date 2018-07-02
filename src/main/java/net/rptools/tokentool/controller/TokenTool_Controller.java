@@ -31,6 +31,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.yaml.YamlConfiguration;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -70,6 +71,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.RotateEvent;
@@ -461,6 +463,68 @@ public class TokenTool_Controller {
 	}
 
 	@FXML
+	void compositeTokenPane_KeyPressed(KeyEvent key) {
+		if (key.getCode().isArrowKey() || key.getCode().isNavigationKey() || key.getCode().isKeypadKey()) {
+
+			double x = portraitImageView.getTranslateX();
+			double y = portraitImageView.getTranslateY();
+
+			switch (key.getCode()) {
+			case LEFT:
+			case KP_LEFT:
+			case NUMPAD4:
+				x--;
+				break;
+			case RIGHT:
+			case KP_RIGHT:
+			case NUMPAD6:
+				x++;
+				break;
+			case UP:
+			case KP_UP:
+			case NUMPAD8:
+				y--;
+				break;
+			case DOWN:
+			case KP_DOWN:
+			case NUMPAD2:
+				y++;
+				break;
+			case HOME:
+			case NUMPAD7:
+				x--;
+				y--;
+				break;
+			case END:
+			case NUMPAD1:
+				x--;
+				y++;
+				break;
+			case PAGE_UP:
+			case NUMPAD9:
+				x++;
+				y--;
+				break;
+			case PAGE_DOWN:
+			case NUMPAD3:
+				x++;
+				y++;
+				break;
+			default:
+				break;
+			}
+
+			portraitImageView.setTranslateX(x);
+			portraitImageView.setTranslateY(y);
+			portraitImageStart.setLocation(x, y);
+
+			updateTokenPreviewImageView();
+
+			key.consume();
+		}
+	}
+
+	@FXML
 	void compositeTokenPane_MouseDragged(MouseEvent event) {
 		portraitImageView.setTranslateX(event.getX() - dragStart.x + portraitImageStart.x);
 		portraitImageView.setTranslateY(event.getY() - dragStart.y + portraitImageStart.y);
@@ -473,6 +537,9 @@ public class TokenTool_Controller {
 		dragStart.setLocation(event.getX(), event.getY());
 		portraitImageStart.setLocation(portraitImageView.getTranslateX(), portraitImageView.getTranslateY());
 		portraitImageView.setCursor(Cursor.MOVE);
+
+		// Get focus for arrow keys...
+		compositeTokenPane.requestFocus();
 	}
 
 	@FXML
@@ -483,7 +550,7 @@ public class TokenTool_Controller {
 
 	@FXML
 	void compositeTokenPane_MouseEntered(MouseEvent event) {
-		portraitImageView.setCursor(Cursor.HAND);
+		portraitImageView.setCursor(Cursor.HAND); // TODO: Not working...
 	}
 
 	@FXML
