@@ -10,6 +10,8 @@ package net.rptools.tokentool.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +84,17 @@ public class FileSaveUtil {
 	}
 
 	public static String cleanFileName(String fileName) {
-		return fileName.replaceAll(AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN, AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+		String decodedFileName = fileName;
+
+		try {
+			decodedFileName = URLDecoder.decode(decodedFileName, "UTF-8").toString();
+		} catch (UnsupportedEncodingException e) {
+			log.error("Issue decoding file name: " + fileName, e);
+		} finally {
+			decodedFileName = decodedFileName.replaceAll(AppConstants.VALID_FILE_NAME_REPLACEMENT_PATTERN, AppConstants.VALID_FILE_NAME_REPLACEMENT_CHARACTER);
+		}
+
+		return decodedFileName;
 	}
 
 	/*

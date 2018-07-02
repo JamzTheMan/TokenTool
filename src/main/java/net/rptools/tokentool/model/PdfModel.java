@@ -72,7 +72,7 @@ public class PdfModel {
 		Image pageImage = SwingFXUtils.toFXImage(pageBufferedImage, null);
 		pageCache.put(pageNumber, pageImage);
 
-		return pageCache.get(pageNumber);
+		return pageImage;
 	}
 
 	public void close() {

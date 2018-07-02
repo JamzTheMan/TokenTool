@@ -260,37 +260,6 @@ public class TokenTool_Controller {
 			}
 		});
 
-		// // Restrict text field to valid filename characters
-		// Pattern validDoubleText = Pattern.compile("[^a-zA-Z0-9\\\\._ \\\\/`~!@#$%\\\\^&\\\\(\\\\)\\\\-\\\\=\\\\+\\\\[\\\\]\\\\{\\\\}',\\\\\\\\:]");
-		// Pattern validText = Pattern.compile("[^a-zA-Z0-9 ]");
-		// TextFormatter<> textFormatter = new TextFormatter<>(
-		// change -> {
-		// String newText = change.getControlNewText();
-		// if (validText.matcher(newText).matches()) {
-		// return change;
-		// } else
-		// return null;
-		// });
-
-		// UnaryOperator<TextFormatter.Change> filter = new UnaryOperator<TextFormatter.Change>() {
-		// @Override
-		// public TextFormatter.Change apply(TextFormatter.Change t) {
-		// String validText = "[^a-zA-Z0-9]";
-		//
-		// if (t.isReplaced())
-		// if (t.getText().matches(validText))
-		// t.setText(t.getControlText().substring(t.getRangeStart(), t.getRangeEnd()));
-		//
-		// if (t.isAdded()) {
-		// if (t.getText().matches(validText)) {
-		// return null;
-		// }
-		// }
-		//
-		// return t;
-		// }
-		// };
-
 		UnaryOperator<Change> filter = change -> {
 			String text = change.getText();
 
