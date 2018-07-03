@@ -60,6 +60,7 @@ public class AppPreferences {
 	private static final String WINDOW_HEIGHT = "window_height";
 
 	public static final String LAST_PDF_FILE = "lastPdfFileSaved";
+	public static final String LAST_BACKGROUND_IMAGE_FILE = "lastBackgroundImageFile";
 
 	public static void setPreference(String preference, String value) {
 		prefs.put(preference, value);

@@ -80,8 +80,13 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.input.ZoomEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -115,6 +120,7 @@ public class TokenTool_Controller {
 	@FXML private TitledPane zoomOptionsPane;
 
 	@FXML private StackPane compositeTokenPane;
+	@FXML private Pane backgroundImagePane;
 	@FXML private BorderPane tokenPreviewPane;
 	@FXML private ScrollPane portraitScrollPane;
 
@@ -199,6 +205,7 @@ public class TokenTool_Controller {
 		assert zoomOptionsPane != null : "fx:id=\"zoomOptionsPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert compositeTokenPane != null : "fx:id=\"compositeTokenPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert backgroundImagePane != null : "fx:id=\"backgroundImagePane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert tokenPreviewPane != null : "fx:id=\"tokenPreviewPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert portraitScrollPane != null : "fx:id=\"portraitScrollPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
@@ -322,8 +329,38 @@ public class TokenTool_Controller {
 	}
 
 	@FXML
-	void removeBackgroundButton_onAction(ActionEvent event) {
+	void removeBackgroundColorButton_onAction(ActionEvent event) {
 		backgroundColorPicker.setValue(Color.TRANSPARENT);
+		updateTokenPreviewImageView();
+	}
+
+	@FXML
+	void changeBackgroundImageButton_onAction(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(I18N.getString("TokenTool.openBackgroundImage.filechooser.title"));
+		fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
+
+		File lastBackgroundImageFile = new File(AppPreferences.getPreference(AppPreferences.LAST_BACKGROUND_IMAGE_FILE, ""));
+
+		if (lastBackgroundImageFile.exists())
+			fileChooser.setInitialDirectory(lastBackgroundImageFile);
+		else if (lastBackgroundImageFile.getParentFile() != null)
+			fileChooser.setInitialDirectory(lastBackgroundImageFile.getParentFile());
+
+		File selectedImageFile = fileChooser.showOpenDialog((Stage) compositeGroup.getScene().getWindow());
+
+		if (selectedImageFile != null) {
+			try {
+				Image selectedImage = new Image(selectedImageFile.toURI().toString());
+				BackgroundImage backgroundImage = new BackgroundImage(selectedImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
+				backgroundImagePane.setBackground(new Background(backgroundImage));
+
+				AppPreferences.setPreference(AppPreferences.LAST_BACKGROUND_IMAGE_FILE, selectedImageFile.getParentFile().getCanonicalPath());
+			} catch (IOException e) {
+				log.error("Error loading Image " + selectedImageFile.getAbsolutePath());
+			}
+		}
+
 		updateTokenPreviewImageView();
 	}
 
@@ -694,6 +731,9 @@ public class TokenTool_Controller {
 		else
 			portraitScrollPane.toBack();
 
+		// Always keep background image in back...
+		backgroundImagePane.toBack();
+
 		updateTokenPreviewImageView();
 	}
 
@@ -784,7 +824,7 @@ public class TokenTool_Controller {
 	}
 
 	public void updateTokenPreviewImageView() {
-		tokenImageView.setImage(ImageUtil.composePreview(compositeTokenPane, backgroundColorPicker.getValue(),
+		tokenImageView.setImage(ImageUtil.composePreview(compositeTokenPane, backgroundImagePane, backgroundColorPicker.getValue(),
 				portraitImageView, maskImageView, overlayImageView, overlayUseAsBaseCheckbox.isSelected(), clipPortraitCheckbox.isSelected()));
 		tokenImageView.setPreserveRatio(true);
 	}

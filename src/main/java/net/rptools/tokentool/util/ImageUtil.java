@@ -45,6 +45,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -253,7 +254,8 @@ public class ImageUtil {
 		return croppedImageView.snapshot(parameter, null);
 	}
 
-	public static Image composePreview(StackPane compositeTokenPane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView, boolean useAsBase,
+	public static Image composePreview(StackPane compositeTokenPane, Pane backgroundImagePane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,
+			boolean useAsBase,
 			boolean clipImage) {
 		// Process layout as maskImage may have changed size if the overlay was changed
 		compositeTokenPane.layout();
@@ -264,6 +266,7 @@ public class ImageUtil {
 		if (clipImage) {
 			// We need to clip the portrait image first then blend the overlay image over it
 			// We will first get a snapshot of the portrait equal to the mask overlay image width/height
+			// We will then get a snapshot of the background image, if any.
 			double x, y, width, height;
 
 			x = maskImageView.getParent().getLayoutX();
@@ -273,18 +276,22 @@ public class ImageUtil {
 
 			Rectangle2D viewPort = new Rectangle2D(x, y, width, height);
 			Rectangle2D maskViewPort = new Rectangle2D(1, 1, width, height);
+			WritableImage newBackgroundImage = new WritableImage((int) width, (int) height);
 			WritableImage newImage = new WritableImage((int) width, (int) height);
 			WritableImage newMaskImage = new WritableImage((int) width, (int) height);
 
+			ImageView backgroundImageView = new ImageView();
 			ImageView overlayCopyImageView = new ImageView();
 			ImageView clippedImageView = new ImageView();
 
 			parameter.setViewport(viewPort);
 			parameter.setFill(bgColor);
+			backgroundImagePane.snapshot(parameter, newBackgroundImage);
+
+			parameter.setFill(Color.TRANSPARENT);
 			portraitImageView.snapshot(parameter, newImage);
 
 			parameter.setViewport(maskViewPort);
-			parameter.setFill(Color.TRANSPARENT);
 			maskImageView.setVisible(true);
 			maskImageView.snapshot(parameter, newMaskImage);
 			maskImageView.setVisible(false);
@@ -292,6 +299,7 @@ public class ImageUtil {
 			clippedImageView.setFitWidth(width);
 			clippedImageView.setFitHeight(height);
 			clippedImageView.setImage(clipImageWithMask(newImage, newMaskImage));
+			backgroundImageView.setImage(clipImageWithMask(newBackgroundImage, newMaskImage));
 
 			// Our masked portrait image is now stored in clippedImageView, lets now blend the overlay image over it
 			// We'll create a temporary group to hold our temporary ImageViews's and blend them and take a snapshot
@@ -301,9 +309,9 @@ public class ImageUtil {
 			overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
 
 			if (useAsBase) {
-				blend = new Group(overlayCopyImageView, clippedImageView);
+				blend = new Group(backgroundImageView, overlayCopyImageView, clippedImageView);
 			} else {
-				blend = new Group(clippedImageView, overlayCopyImageView);
+				blend = new Group(backgroundImageView, clippedImageView, overlayCopyImageView);
 			}
 
 			// Last, we'll clean up any excess transparent edges by cropping it
