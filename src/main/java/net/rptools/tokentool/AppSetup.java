@@ -151,21 +151,26 @@ public class AppSetup {
 		String[] installedVersions = installedVersion.indexOf(".") > 0 ? installedVersion.split("\\.") : new String[] { installedVersion };
 
 		int i = 0;
-		for (String ver : versions) {
-			int v = Integer.parseInt(ver);
-			int iv = 0;
+		try {
+			for (String ver : versions) {
+				int v = Integer.parseInt(ver);
+				int iv = 0;
 
-			if (installedVersions.length > i)
-				iv = Integer.parseInt(installedVersions[i]);
+				if (installedVersions.length > i)
+					iv = Integer.parseInt(installedVersions[i]);
 
-			if (v > iv) {
-				log.info("New version detected.");
-				return true;
-			} else if (iv > v) {
-				return false;
+				if (v > iv) {
+					log.info("New version detected.");
+					return true;
+				} else if (iv > v) {
+					return false;
+				}
+
+				i++;
 			}
-
-			i++;
+		} catch (NumberFormatException e) {
+			log.warn("Unable to parse version, installedVersion: " + version + ", " + installedVersion);
+			return false;
 		}
 
 		return false;

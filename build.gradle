@@ -45,17 +45,21 @@ ext {
 
 	def repo = org.ajoberstar.grgit.Grgit.open(currentDir: file('.'))
 	def head = repo.head()
-	def headTag = repo.tag.list().find {
+	def tags = repo.tag.list().find {
 		it.commit == head
-	}
-
-	if (headTag) {
-		tagVersion = headTag
-		msiVersion = headTag
 	}
 
 	revision = head.abbreviatedId
 	revisionFull = head.id
+
+	if (tags) {
+		tagVersion = tags.getName()
+		msiVersion = tagVersion
+	} else {
+		tagVersion = 'SNAPSHOT-' + revision
+	}
+
+	println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
 }
 
 // Default parameters for gradle run command
@@ -202,11 +206,12 @@ task prepareInnoSetup(type: Copy) {
 task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 	group = 'distribution'
 	description = 'Create native installers'
-	println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
 
 	tasks.findByName('copyPackageExtras').mustRunAfter 'uberJar'
 
 	doLast {
+		println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
+
 		// Using the -deploy Command with Bundler Arguments
 		// 		javapackager -deploy -native exe -BsystemWide=true -BjvmOptions=-Xmx128m -BjvmOptions=-Xms128m -outdir packages -outfile BrickBreaker -srcdir dist
 		//		-srcfiles BrickBreaker.jar -appclass brickbreaker.Main -name BrickBreaker -title "BrickBreaker demo"
