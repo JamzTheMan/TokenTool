@@ -42,7 +42,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Files]
 Source: "TokenTool/TokenTool.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "TokenTool/*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-;Source: ${InstallDLL}; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}${Slash}TokenTool"; Filename: "{app}/TokenTool.exe"; IconFilename: "{app}/TokenTool.ico"; Check: returnTrue()

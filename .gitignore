@@ -1,7 +1,7 @@
 # Gradle
 ################################################################################
 .gradle
-/gradle.properties
+gradle-local.properties
 /gradlew.bat
 /gradlew
 
@@ -43,3 +43,5 @@ bin/*
 sentry-events/*
 /bin/
 /build/
+package/windows/TokenTool.iss
+

@@ -28,9 +28,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'com.diffplug.gradle.spotless'
 
-// Current Build version
-version = '2.1'
-
 // Definitions
 defaultTasks 'clean', 'build'
 sourceCompatibility = 10
@@ -44,17 +41,26 @@ mainClassName = 'net.rptools.tokentool.client.TokenTool'
 
 // Custom properties
 ext {
-	vendor = "Nerps" // Change to RPTools or "" for official builds
 	preloaderClassName = 'net.rptools.tokentool.client.SplashScreenLoader'
-	msiVersion = '2.1.0'
-	git = org.ajoberstar.grgit.Grgit.open(currentDir: file('.'))
-	revision = git.head().abbreviatedId
-	revisionFull = git.head().id
+
+	def repo = org.ajoberstar.grgit.Grgit.open(currentDir: file('.'))
+	def head = repo.head()
+	def headTag = repo.tag.list().find {
+		it.commit == head
+	}
+
+	if (headTag) {
+		tagVersion = headTag
+		msiVersion = headTag
+	}
+
+	revision = head.abbreviatedId
+	revisionFull = head.id
 }
 
 // Default parameters for gradle run command
 run {
-	args = [ '-v='+version, '-vendor='+vendor ]
+	args = [ '-v='+tagVersion, '-vendor='+vendor ]
 	applicationDefaultJvmArgs = [ "-Djavafx.preloader=" + preloaderClassName, "-Dsentry.environment=Development" ]
 
 	if(System.getProperty("exec.args") != null) {
@@ -147,7 +153,7 @@ task uberJar(type: Jar) {
 
 	manifest {
 		attributes 'Implementation-Title': project.name,
-		'Implementation-Version': version,
+		'Implementation-Version': tagVersion,
 		'Implementation-Vendor': vendor,
 		'Git-Commit': revision,
 		'Git-Commit-SHA': revisionFull,
@@ -170,7 +176,7 @@ task uberJar(type: Jar) {
 	exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
-// Currently includes license and msvcr100.dll (due to packaging bug)
+// Currently includes license files
 task copyPackageExtras(type: Copy) {
 	from('package/license/')
 	into('build/libs/')
@@ -183,11 +189,10 @@ task prepareInnoSetup(type: Copy) {
 	rename("TokenTool.iss.template", "TokenTool.iss")
 	def tokens = [
 		AppName: "${project.name}",
-		AppVersion: "${version}",
+		AppVersion: "${tagVersion}",
 		Vendor: "${vendor}",
 		SetupIcon: "${project.projectDir.absolutePath}/package/windows/${project.name}.ico",
 		WizardImage: "${project.projectDir.absolutePath}/package/windows/${project.name}-setup.bmp",
-		//InstallDLL: "${project.projectDir.absolutePath}/package/windows/msvcr100.dll",
 		Slash: "\\",
 	]
 	expand(tokens)
@@ -197,6 +202,7 @@ task prepareInnoSetup(type: Copy) {
 task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 	group = 'distribution'
 	description = 'Create native installers'
+	println 'Deploying ' + project.name + " " + tagVersion + " by " + vendor
 
 	tasks.findByName('copyPackageExtras').mustRunAfter 'uberJar'
 
@@ -215,10 +221,10 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 				"-appclass", mainClassName,
 				"-preloader", preloaderClassName,
 				"-srcdir", "build/libs",
-				"-outdir", "releases/release-"+version,
+				"-outdir", "releases/release-"+tagVersion,
 				"-outfile", project.name,
 				"-name", project.name,
-				"-description", project.name + " " + version + " by " + vendor,
+				"-description", project.name + " " + tagVersion + " by " + vendor,
 				"-title", project.name,
 				"-vendor", vendor,
 				"-BdropinResourcesRoot=.",
@@ -227,7 +233,7 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 				"-BmenuHint=true",
 				"-Bwin.menuGroup=" + vendor,
 				"-BshortcutHint=true",
-				"-BappVersion=" + version,
+				"-BappVersion=" + tagVersion,
 				"-Bwin.msi.productVersion=" + msiVersion,
 				"-BlicenseFile=COPYING.AFFERO",
 				"-BlicenseType='GNU AFFERO GENERAL PUBLIC LICENSE'",
