@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,11 +28,20 @@ import net.rptools.tokentool.controller.PdfViewer_Controller;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 
 public class PdfViewer {
+	private static final Logger log = LogManager.getLogger(PdfViewer.class);
 	private Stage stage;
 
-	public PdfViewer(File selectedPDF, TokenTool_Controller tokenTool_Controller) throws IOException {
+	public PdfViewer(File selectedPDF, TokenTool_Controller tokenTool_Controller) {
+		Parent root;
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.PDF_VIEW_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-		Parent root = fxmlLoader.load();
+
+		try {
+			root = fxmlLoader.load();
+		} catch (IOException e) {
+			log.error("Error loading PdfViewer Stage!", e);
+			return;
+		}
+
 		PdfViewer_Controller pdfViewerController = fxmlLoader.<PdfViewer_Controller> getController();
 
 		stage = new Stage();

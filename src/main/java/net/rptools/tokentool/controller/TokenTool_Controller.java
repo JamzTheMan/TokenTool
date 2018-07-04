@@ -31,8 +31,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.yaml.YamlConfiguration;
-
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -662,8 +660,14 @@ public class TokenTool_Controller {
 		if (db.hasFiles()) {
 			db.getFiles().forEach(file -> {
 				try {
-					updateFileNameTextField(FilenameUtils.getBaseName(file.toURI().toURL().toExternalForm()));
-					updatePortrait(new Image(file.toURI().toURL().toExternalForm()));
+					String fileName = FilenameUtils.getName(file.toURI().toURL().toExternalForm());
+
+					if (FilenameUtils.isExtension(fileName.toLowerCase(), "pdf")) {
+						Platform.runLater(() -> new PdfViewer(file, this));
+					} else {
+						updateFileNameTextField(FilenameUtils.getBaseName(fileName));
+						updatePortrait(new Image(file.toURI().toURL().toExternalForm()));
+					}
 				} catch (Exception e) {
 					log.error("Could not load image " + file, e);
 				}
