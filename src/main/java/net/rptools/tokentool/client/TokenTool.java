@@ -269,7 +269,7 @@ public class TokenTool extends Application {
 				return cmd.getOptionValue(searchValue);
 			}
 		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
+			// We don't have the logger instance at this point yet...
 			e1.printStackTrace();
 		}
 
@@ -287,7 +287,7 @@ public class TokenTool extends Application {
 	}
 
 	/**
-	 * Legacy, it simply launches the FX Application which calls init() then start()
+	 * Legacy, it simply launches the FX Application which calls init() then start(). Also sets/calls the preloader class
 	 * 
 	 * @author Jamz
 	 * @since 2.0
@@ -297,12 +297,13 @@ public class TokenTool extends Application {
 	 */
 	public static void main(String[] args) {
 		Options cmdOptions = new Options();
-		cmdOptions.addOption("v", "version", true, "override version number"); //$NON-NLS-2$ //$NON-NLS-3$
-		cmdOptions.addOption("n", "vendor", true, "override vendor"); //$NON-NLS-2$ //$NON-NLS-3$
+		cmdOptions.addOption("v", "version", true, "override version number");
+		cmdOptions.addOption("n", "vendor", true, "override vendor");
 
 		VERSION = getCommandLineStringOption(cmdOptions, "version", args);
 		VENDOR = getCommandLineStringOption(cmdOptions, "vendor", args);
 
+		System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
 		launch(args);
 	}
 }

@@ -123,6 +123,13 @@
 }
 
 
+/* CSS For Drag and Drop area notification*/
+.dndActionBorder {
+	-fx-border-color: #00ff0099;
+	-fx-border-width: 75.0px
+}
+
+
 /* CSS For Credits window */
 .text-area, .text-area .viewport, .text-area .content {
     -fx-background-color: transparent ;

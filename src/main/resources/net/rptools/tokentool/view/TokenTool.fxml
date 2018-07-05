@@ -10,8 +10,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
@@ -20,6 +22,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
@@ -93,7 +96,7 @@
 										<Pane fx:id="backgroundImagePane" prefHeight="200.0" prefWidth="200.0" />
 										<ScrollPane fx:id="portraitScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER">
 											<content>
-												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.6" scaleY="0.6" translateX="25.0" translateY="115.0">
+												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" translateY="150.0">
 													<image>
 														<Image url="@../image/creative_commons_portrait.png" />
 													</image>
@@ -114,9 +117,38 @@
 												</ImageView>
 											</children>
 										</Group>
-										<Pane fx:id="onMousePane" prefHeight="200.0" prefWidth="200.0" />
+										<Pane fx:id="onMousePane" />
 									</children>
 								</StackPane>
+                        <AnchorPane fx:id="actionPane" styleClass="dndActionBorder">
+                           <children>
+                              <MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                 <items>
+                                    <RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" text="Background">
+                                       <accelerator>
+                                          <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                       </accelerator>
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="selectedLayer" />
+                                       </toggleGroup>
+                                    </RadioMenuItem>
+                                    <RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" selected="true" text="Portrait" toggleGroup="$selectedLayer">
+                                       <accelerator>
+                                          <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                       </accelerator>
+                                    </RadioMenuItem>
+                                    <RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer">
+                                       <accelerator>
+                                          <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                       </accelerator>
+                                    </RadioMenuItem>
+                                 </items>
+                                 <font>
+                                    <Font name="System Bold Italic" size="14.0" />
+                                 </font>
+                              </MenuButton>
+                           </children>
+                        </AnchorPane>
 							</children>
 						</StackPane>
 						<VBox alignment="TOP_CENTER" spacing="5.0">
