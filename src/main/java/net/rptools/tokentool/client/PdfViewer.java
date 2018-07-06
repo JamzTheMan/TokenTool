@@ -15,6 +15,9 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,8 +27,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.controller.PdfViewer_Controller;
 import net.rptools.tokentool.controller.TokenTool_Controller;
+import net.rptools.tokentool.model.Window_Preferences;
 
 public class PdfViewer {
 	private static final Logger log = LogManager.getLogger(PdfViewer.class);
@@ -48,22 +53,27 @@ public class PdfViewer {
 		Scene scene = new Scene(root);
 
 		stage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
-		stage.initModality(Modality.NONE);
+		stage.initModality(Modality.WINDOW_MODAL);
 		stage.setTitle(selectedPDF.getName());
 		stage.setScene(scene);
 
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
+				log.debug("Shutting down PDF Viewer...");
+				AppPreferences.setPreference(AppPreferences.WINDOW_PDF_PREFERENCES, new Window_Preferences(stage).toJson());
 				stage.hide();
 				pdfViewerController.close();
 			}
 		});
 
+		String preferencesJson = AppPreferences.getPreference(AppPreferences.WINDOW_PDF_PREFERENCES, null);
+		if (preferencesJson != null) {
+			Window_Preferences window_Preferences = new Gson().fromJson(preferencesJson, new TypeToken<Window_Preferences>() {}.getType());
+			window_Preferences.setWindow(stage);
+		}
+
 		stage.show();
 		pdfViewerController.loadPDF(selectedPDF, tokenTool_Controller, stage);
-
-		// Adjusts for tile pane images after loading PDF which adjusts width
-		// stage.setWidth(stage.getWidth() + 215);
 	}
 }

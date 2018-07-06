@@ -45,44 +45,50 @@
 					<menus>
 						<Menu text="%menu.title.file">
 							<items>
-								<MenuItem fx:id="fileOpenPDF_Menu" onAction="#fileOpenPDF_Menu_onAction" text="%menu.title.file.open.pdf">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
-								<MenuItem fx:id="fileManageOverlaysMenu" onAction="#fileManageOverlaysMenu_onAction" text="%menu.title.file.manage.overlays">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="M" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
-								<MenuItem fx:id="fileSaveAsMenu" onAction="#fileSaveAsMenu_onAction" text="%menu.title.file.save.as">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
+								<MenuItem fx:id="fileOpenPDF_Menu" onAction="#fileOpenPDF_Menu_OnAction" text="%menu.title.file.open.pdf">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+									</accelerator>
+								</MenuItem>
+								<MenuItem fx:id="fileManageOverlaysMenu" onAction="#fileManageOverlaysMenu_OnAction" text="%menu.title.file.manage.overlays">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="M" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+									</accelerator>
+								</MenuItem>
+								<MenuItem fx:id="fileSaveAsMenu" onAction="#fileSaveAsMenu_OnAction" text="%menu.title.file.save.as">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+									</accelerator>
+								</MenuItem>
 								<SeparatorMenuItem mnemonicParsing="false" />
-								<MenuItem fx:id="fileExitMenu" onAction="#fileExitMenu_onAction" text="%menu.title.file.exit" />
+								<MenuItem fx:id="fileExitMenu" onAction="#fileExitMenu_OnAction" text="%menu.title.file.exit" />
 							</items>
 						</Menu>
 						<Menu text="%menu.title.edit">
 							<items>
-								<MenuItem fx:id="editCaptureScreenMenu" onAction="#editCaptureScreenMenu_onAction" text="%menu.title.edit.capture.screen">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="R" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
+								<MenuItem fx:id="editCaptureScreenMenu" onAction="#editCaptureScreenMenu_OnAction" text="%menu.title.edit.capture.screen">
+									<accelerator>
+										<KeyCodeCombination alt="UP" code="R" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+									</accelerator>
+								</MenuItem>
 								<SeparatorMenuItem mnemonicParsing="false" />
-								<MenuItem fx:id="editCopyImageMenu" onAction="#editCopyImageMenu_onAction" text="%menu.title.edit.copy.image">
+								<MenuItem fx:id="editCopyImageMenu" onAction="#editCopyImageMenu_OnAction" text="%menu.title.edit.copy.image">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
-								<MenuItem fx:id="editPasteImageMenu" onAction="#editPasteImageMenu_onAction" text="%menu.title.edit.paste.image">
+								<MenuItem fx:id="editPasteImageMenu" onAction="#editPasteImageMenu_OnAction" text="%menu.title.edit.paste.image">
 									<accelerator>
 										<KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 									</accelerator>
 								</MenuItem>
 							</items>
 						</Menu>
-						<Menu fx:id="helpAboutMenu" onAction="#helpAboutMenu_onAction" text="%menu.title.help">
+						<Menu fx:id="helpAboutMenu" text="%menu.title.help">
 							<items>
-								<MenuItem text="%menu.title.help.about" />
+                        <MenuItem fx:id="helpResetMenu" onAction="#helpResetMenu_OnAction" text="%menu.title.help.reset" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem fx:id="helpAboutMenu" onAction="#helpAboutMenu_OnAction" text="%menu.title.help.about" />
 							</items>
 						</Menu>
 					</menus>
@@ -91,17 +97,21 @@
 					<children>
 						<StackPane styleClass="composite-view-checkered" HBox.hgrow="ALWAYS">
 							<children>
-								<StackPane fx:id="compositeTokenPane" focusTraversable="true" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragOver="#compositeTokenPane_DragOver" onKeyPressed="#compositeTokenPane_KeyPressed" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
+								<StackPane fx:id="compositeTokenPane" focusTraversable="true" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragEntered="#compositeTokenPane_DragEntered" onDragExited="#compositeTokenPane_DragExited" onDragOver="#compositeTokenPane_DragOver" onKeyPressed="#compositeTokenPane_KeyPressed" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
 									<children>
-										<Pane fx:id="backgroundImagePane" prefHeight="200.0" prefWidth="200.0" />
+                              <ScrollPane fx:id="backgroundImagePane" hbarPolicy="NEVER" layoutX="10.0" layoutY="10.0" vbarPolicy="NEVER">
+                                 <content>
+                                    <ImageView fx:id="backgroundImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                                 </content>
+                              </ScrollPane>
 										<ScrollPane fx:id="portraitScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER">
-											<content>
-												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" translateY="150.0">
+                                 <content>
+												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.65" scaleY="0.65" translateX="15.0" translateY="100.0">
 													<image>
 														<Image url="@../image/creative_commons_portrait.png" />
 													</image>
 												</ImageView>
-											</content>
+                                 </content>
 										</ScrollPane>
 										<Group fx:id="compositeGroup">
 											<children>
@@ -117,38 +127,38 @@
 												</ImageView>
 											</children>
 										</Group>
-										<Pane fx:id="onMousePane" />
+										<Pane fx:id="dndHighlights" />
+										<AnchorPane fx:id="actionPane">
+											<children>
+												<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+													<items>
+														<RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" onAction="#backgroundMenuItem_OnAction" text="Background">
+															<accelerator>
+																<KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+															</accelerator>
+															<toggleGroup>
+																<ToggleGroup fx:id="selectedLayer" />
+															</toggleGroup>
+														</RadioMenuItem>
+														<RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" onAction="#portraitMenuItem_OnAction" selected="true" text="Portrait" toggleGroup="$selectedLayer">
+															<accelerator>
+																<KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+															</accelerator>
+														</RadioMenuItem>
+														<RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer" visible="false">
+															<accelerator>
+																<KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+															</accelerator>
+														</RadioMenuItem>
+													</items>
+													<font>
+														<Font name="System Bold Italic" size="14.0" />
+													</font>
+												</MenuButton>
+											</children>
+										</AnchorPane>
 									</children>
 								</StackPane>
-                        <AnchorPane fx:id="actionPane" styleClass="dndActionBorder">
-                           <children>
-                              <MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                 <items>
-                                    <RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" text="Background">
-                                       <accelerator>
-                                          <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                                       </accelerator>
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="selectedLayer" />
-                                       </toggleGroup>
-                                    </RadioMenuItem>
-                                    <RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" selected="true" text="Portrait" toggleGroup="$selectedLayer">
-                                       <accelerator>
-                                          <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                                       </accelerator>
-                                    </RadioMenuItem>
-                                    <RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer">
-                                       <accelerator>
-                                          <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                                       </accelerator>
-                                    </RadioMenuItem>
-                                 </items>
-                                 <font>
-                                    <Font name="System Bold Italic" size="14.0" />
-                                 </font>
-                              </MenuButton>
-                           </children>
-                        </AnchorPane>
 							</children>
 						</StackPane>
 						<VBox alignment="TOP_CENTER" spacing="5.0">
@@ -184,13 +194,13 @@
 																				<Insets bottom="-4.0" />
 																			</VBox.margin>
 																		</Label>
-																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_onAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
-																		<Button fx:id="removeBackgroundColorButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundColorButton_onAction" text="%options.pane.portrait.button.Remove_Background_Color">
+																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_OnAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
+																		<Button fx:id="removeBackgroundColorButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundColorButton_OnAction" text="%options.pane.portrait.button.Remove_Background_Color">
 																			<font>
 																				<Font size="11.0" />
 																			</font>
 																		</Button>
-																		<Button fx:id="changeBackgroundImageButton" layoutX="20.0" layoutY="68.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeBackgroundImageButton_onAction" text="%options.pane.portrait.button.Add_Background_Image">
+																		<Button fx:id="changeBackgroundImageButton" layoutX="20.0" layoutY="68.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeBackgroundImageButton_OnAction" text="%options.pane.portrait.button.Add_Background_Image">
 																			<font>
 																				<Font size="11.0" />
 																			</font>
@@ -236,7 +246,7 @@
 																			</VBox.margin>
 																		</Label>
 																		<TextField fx:id="fileNameTextField" maxWidth="1.7976931348623157E308" text="token" />
-																		<CheckBox fx:id="useFileNumberingCheckbox" mnemonicParsing="false" onAction="#useFileNumberingCheckbox_onAction" styleClass="controls" text="%controls.useFileNumberingCheckbox.text" />
+																		<CheckBox fx:id="useFileNumberingCheckbox" mnemonicParsing="false" onAction="#useFileNumberingCheckbox_OnAction" styleClass="controls" text="%controls.useFileNumberingCheckbox.text" />
 																		<HBox alignment="CENTER_LEFT" spacing="5.0">
 																			<children>
 																				<Label fx:id="fileNameSuffixLabel" disable="true" styleClass="controls-label" text="%controls.filenameSuffixLabel.text" />
@@ -292,8 +302,8 @@
 																					<children>
 																						<FlowPane hgap="10.0" prefWidth="187.0" vgap="10.0">
 																							<children>
-																								<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
-																								<CheckBox fx:id="clipPortraitCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_onAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.clip_portrait" />
+																								<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_OnAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
+																								<CheckBox fx:id="clipPortraitCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_OnAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.clip_portrait" />
 																							</children>
 																						</FlowPane>
 																					</children>
@@ -324,7 +334,7 @@
 																						</VBox>
 																						<AnchorPane>
 																							<children>
-																								<ToggleButton fx:id="overlayAspectToggleButton" contentDisplay="TOP" graphicTextGap="0.0" mnemonicParsing="false" onAction="#overlayAspectToggleButton_onAction" selected="true" styleClass="aspect-lock-toggle-button" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+																								<ToggleButton fx:id="overlayAspectToggleButton" contentDisplay="TOP" graphicTextGap="0.0" mnemonicParsing="false" onAction="#overlayAspectToggleButton_OnAction" selected="true" styleClass="aspect-lock-toggle-button" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
 																									<padding>
 																										<Insets bottom="8.0" left="4.0" right="4.0" top="8.0" />
 																									</padding>

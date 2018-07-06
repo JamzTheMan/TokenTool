@@ -14,11 +14,13 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
+import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -57,7 +59,9 @@ public class PdfViewer_Controller implements Initializable {
 
 	private PdfModel pdfModel;
 	private ImageView pdfImageView = new ImageView();
-	private ExecutorService renderPdfPageService;
+
+	private static ExecutorService renderPdfPageService;
+	private AtomicInteger workerThreads = new AtomicInteger(0);
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -71,7 +75,9 @@ public class PdfViewer_Controller implements Initializable {
 		assert imageTileScrollpane != null : "fx:id=\"imageTileScrollpane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 
 		pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-		renderPdfPageService = Executors.newSingleThreadExecutor();
+		pdfViewPagination.requestFocus();
+
+		renderPdfPageService = Executors.newWorkStealingPool();
 	}
 
 	public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller, Stage stage) {
@@ -93,6 +99,8 @@ public class PdfViewer_Controller implements Initializable {
 
 		pdfViewPagination.setPageFactory(new Callback<Integer, Node>() {
 			public Node call(final Integer pageIndex) {
+				workerThreads.incrementAndGet();
+
 				// First, blank the page out
 				pdfImageView.setImage(null);
 
@@ -120,34 +128,44 @@ public class PdfViewer_Controller implements Initializable {
 			long startTime = System.currentTimeMillis();
 
 			pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-			pdfProgressIndicator.setVisible(true);
-			pdfProgressIndicator.setOpacity(1);
+
+			// Don't show the progressIndicator for brief transitions...
+			PauseTransition pause = new PauseTransition(Duration.millis(400));
+			pause.setOnFinished(event -> {
+				pdfProgressIndicator.setVisible(true);
+				pdfProgressIndicator.setOpacity(1);
+			});
+			pause.play();
 
 			// Do the actual work
 			Image image = pdfModel.getImage(pageIndex);
 
-			// Only show the last page requested otherwise could be confusing when page doesn't match pagination index
-			// Look into killing other tasks?
-			if (pdfViewPagination.getCurrentPageIndex() == pageIndex) {
+			pdfImageView.setImage(image);
 
-				// once operation is finished we update UI with results
-				Platform.runLater(() -> {
-					pdfImageView.setImage(image);
+			// Skip the animation for quick page turns
+			long loadTime = System.currentTimeMillis() - startTime;
+			if (loadTime < 500) {
+				pause.stop();
+				pdfProgressIndicator.setVisible(false);
+			} else {
+				pdfProgressIndicator.setVisible(true);
 
-					long loadTime = System.currentTimeMillis() - startTime;
-					if (loadTime < 500)
-						pdfProgressIndicator.setVisible(false);
-					else {
-						pdfProgressIndicator.setVisible(true);
-
-						FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), pdfProgressIndicator);
-						fadeTransition.setFromValue(1.0);
-						fadeTransition.setToValue(0.0);
-						fadeTransition.play();
-					}
-				});
+				FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), pdfProgressIndicator);
+				fadeTransition.setFromValue(1.0);
+				fadeTransition.setToValue(0.0);
+				fadeTransition.play();
 			}
+
 			return null;
+		}
+
+		@Override
+		protected void done() {
+			// Since we are rendering in multiple threads, lets make sure the current page is shown when we are all done!
+			if (workerThreads.decrementAndGet() == 0) {
+				pdfImageView.setImage(pdfModel.getImage(pdfViewPagination.getCurrentPageIndex()));
+				// Platform.runLater(() -> extractImages()); // safe to do this now? still lags it up... wait till we multi-thread this i guess...
+			}
 		}
 	}
 
@@ -172,7 +190,6 @@ public class PdfViewer_Controller implements Initializable {
 
 	public void close() {
 		pdfModel.close();
-		renderPdfPageService.shutdownNow();
 	}
 
 	@FXML

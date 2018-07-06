@@ -254,7 +254,7 @@ public class ImageUtil {
 		return croppedImageView.snapshot(parameter, null);
 	}
 
-	public static Image composePreview(StackPane compositeTokenPane, Pane backgroundImagePane, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,
+	public static Image composePreview(StackPane compositeTokenPane, ImageView backgroundImageView, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,
 			boolean useAsBase,
 			boolean clipImage) {
 		// Process layout as maskImage may have changed size if the overlay was changed
@@ -280,13 +280,13 @@ public class ImageUtil {
 			WritableImage newImage = new WritableImage((int) width, (int) height);
 			WritableImage newMaskImage = new WritableImage((int) width, (int) height);
 
-			ImageView backgroundImageView = new ImageView();
+			ImageView newBackgroundImageView = new ImageView();
 			ImageView overlayCopyImageView = new ImageView();
 			ImageView clippedImageView = new ImageView();
 
 			parameter.setViewport(viewPort);
 			parameter.setFill(bgColor);
-			backgroundImagePane.snapshot(parameter, newBackgroundImage);
+			backgroundImageView.snapshot(parameter, newBackgroundImage);
 
 			parameter.setFill(Color.TRANSPARENT);
 			portraitImageView.snapshot(parameter, newImage);
@@ -299,7 +299,7 @@ public class ImageUtil {
 			clippedImageView.setFitWidth(width);
 			clippedImageView.setFitHeight(height);
 			clippedImageView.setImage(clipImageWithMask(newImage, newMaskImage));
-			backgroundImageView.setImage(clipImageWithMask(newBackgroundImage, newMaskImage));
+			newBackgroundImageView.setImage(clipImageWithMask(newBackgroundImage, newMaskImage));
 
 			// Our masked portrait image is now stored in clippedImageView, lets now blend the overlay image over it
 			// We'll create a temporary group to hold our temporary ImageViews's and blend them and take a snapshot
@@ -309,9 +309,9 @@ public class ImageUtil {
 			overlayCopyImageView.setOpacity(overlayImageView.getOpacity());
 
 			if (useAsBase) {
-				blend = new Group(backgroundImageView, overlayCopyImageView, clippedImageView);
+				blend = new Group(newBackgroundImageView, overlayCopyImageView, clippedImageView);
 			} else {
-				blend = new Group(backgroundImageView, clippedImageView, overlayCopyImageView);
+				blend = new Group(newBackgroundImageView, clippedImageView, overlayCopyImageView);
 			}
 
 			// Last, we'll clean up any excess transparent edges by cropping it

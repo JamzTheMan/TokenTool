@@ -1,3 +1,8 @@
+/* 	For reference... 
+	https://docs.oracle.com/javase/10/docs/api/javafx/scene/doc-files/cssref.html
+	http://www.oracle.com/technetwork/articles/javafx/javafx-css-159889.html
+*/
+
 /* Add custom font */
 @font-face {
     font-family: Horta;
@@ -120,13 +125,6 @@
 	-fx-background-size: 20.0px 20.0px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: center;
-}
-
-
-/* CSS For Drag and Drop area notification*/
-.dndActionBorder {
-	-fx-border-color: #00ff0099;
-	-fx-border-width: 75.0px
 }
 
 

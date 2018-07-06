@@ -196,7 +196,7 @@ public final class ExtractImagesFromPDF {
 		imageButton.addEventHandler(ActionEvent.ACTION, event -> {
 			imageButton.setSelected(true);
 
-			tokenTool_Controller.updatePortrait(imageViewNode.getImage());
+			tokenTool_Controller.updateImage(imageViewNode.getImage(), imageName);
 			event.consume();
 		});
 

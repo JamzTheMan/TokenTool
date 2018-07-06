@@ -8,8 +8,12 @@
  */
 package net.rptools.tokentool.model;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -18,6 +22,7 @@ import java.util.Map;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.TilePane;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.ExtractImagesFromPDF;
@@ -36,7 +41,9 @@ public class PdfModel {
 	private PDFRenderer renderer;
 	private ExtractImagesFromPDF imageExtractor;
 
-	private int DPI = Toolkit.getDefaultToolkit().getScreenResolution();
+	// Not sure if this gives proper DPI on multiple monitor setup? For instance, it returns 96 for me when the specs for Dell U3415W says 109?
+	// Was rendering a little blurry at 96 so lets give it a bump, sacrificing memory for resolution...
+	private double DPI = Math.max(Toolkit.getDefaultToolkit().getScreenResolution() * 1.5, 100);
 
 	private Map<Integer, Image> pageCache = new HashMap<Integer, Image>();
 
@@ -51,7 +58,7 @@ public class PdfModel {
 			throw new UncheckedIOException("PDDocument throws IOException file=" + pdfFile.getAbsolutePath(), ex);
 		}
 
-		log.info("Current DPI returned by OS: " + DPI);
+		log.info("Rendering at " + DPI + " DPI");
 	}
 
 	public int numPages() {
@@ -62,15 +69,17 @@ public class PdfModel {
 		if (pageCache.containsKey(pageNumber))
 			return pageCache.get(pageNumber);
 
-		BufferedImage pageBufferedImage;
+		Image pageImage = new WritableImage(1, 1);
+
 		try {
-			pageBufferedImage = renderer.renderImageWithDPI(pageNumber, DPI);
+			BufferedImage pageBufferedImage = renderer.renderImageWithDPI(pageNumber, (float) DPI);
+			pageImage = SwingFXUtils.toFXImage(pageBufferedImage, null);
+			pageCache.put(pageNumber, pageImage);
+		} catch (EOFException eof) {
+			log.warn("PDFBox encountered an error: ", eof);
 		} catch (IOException ex) {
 			throw new UncheckedIOException("PDFRenderer throws IOException", ex);
 		}
-
-		Image pageImage = SwingFXUtils.toFXImage(pageBufferedImage, null);
-		pageCache.put(pageNumber, pageImage);
 
 		return pageImage;
 	}

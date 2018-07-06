@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,6 +25,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import net.rptools.tokentool.AppConstants;
+import net.rptools.tokentool.AppPreferences;
+import net.rptools.tokentool.model.Window_Preferences;
 
 public class RegionSelector_Controller {
 	private static final Logger log = LogManager.getLogger(RegionSelector_Controller.class);
@@ -47,17 +50,22 @@ public class RegionSelector_Controller {
 		int sceneWidth = (int) scene.getWidth();
 		int sceneHeight = (int) scene.getHeight();
 
-		try {
-			stage.hide();
-			// Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
-			log.info("Rect: " + new Rectangle(x, y, sceneWidth, sceneHeight));
-			BufferedImage bi = new Robot().createScreenCapture(new Rectangle(x, y, sceneWidth, sceneHeight));
-			tokenTool_Controller.updatePortrait(SwingFXUtils.toFXImage(bi, null));
-		} catch (AWTException e) {
-			log.error(e);
-		}
+		stage.hide();
+		log.debug("Rect: " + new Rectangle(x, y, sceneWidth, sceneHeight));
 
-		stage.close();
+		// Test to see if this works better on Linux. Linux would still capture this stage in the image...
+		Platform.runLater(() -> {
+			try {
+				// Robot robot = new Robot(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice());
+				BufferedImage bi = new Robot().createScreenCapture(new Rectangle(x, y, sceneWidth, sceneHeight));
+				tokenTool_Controller.updateImage(SwingFXUtils.toFXImage(bi, null));
+
+				AppPreferences.setPreference(AppPreferences.WINDOW_REGION_SELECTOR_PREFERENCES, new Window_Preferences(stage).toJson());
+				stage.close();
+			} catch (AWTException e) {
+				log.error("Error capturing screen shot!", e);
+			}
+		});
 	}
 
 	public void setController(TokenTool_Controller controller) {

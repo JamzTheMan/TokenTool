@@ -31,7 +31,6 @@ import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeItem;
@@ -39,7 +38,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.AppSetup;
@@ -149,18 +147,12 @@ public class TokenTool extends Application {
 			}
 		});
 
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				tokentool_Controller.exitApplication();
-			}
-		});
-
 		// Load all the overlays into the treeview
 		tokentool_Controller.updateOverlayTreeview(overlayTreeItems);
 
 		// Restore saved settings
 		AppPreferences.restorePreferences(tokentool_Controller);
+		tokentool_Controller.updateTokenPreviewImageView();
 
 		// Add recent list to treeview
 		tokentool_Controller.updateOverlayTreeViewRecentFolder(true);
@@ -168,10 +160,17 @@ public class TokenTool extends Application {
 		// Set the Overlay Options accordion to be default open view
 		tokentool_Controller.expandOverlayOptionsPane(true);
 
+		primaryStage.setOnCloseRequest(e -> tokentool_Controller.exitApplication());
 		primaryStage.show();
 
 		// Finally, update token preview image after everything is done loading
 		Platform.runLater(() -> tokentool_Controller.updateTokenPreviewImageView());
+	}
+
+	@Override
+	public void stop() {
+		// Make sure any hanging threads are closed as well...
+		System.exit(0);
 	}
 
 	public static TokenTool getInstance() {

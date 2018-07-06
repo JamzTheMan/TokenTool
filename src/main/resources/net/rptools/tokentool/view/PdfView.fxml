@@ -21,7 +21,7 @@
             <Pane fx:id="viewPortPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
             <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-            		<Pagination fx:id="pdfViewPagination" maxPageIndicatorCount="20" onMouseClicked="#pdfViewPagination_onMouseClick" onScroll="#pdfViewPagination_OnScroll" stylesheets="@../css/TokenTool.css">
+            		<Pagination fx:id="pdfViewPagination" maxPageIndicatorCount="20" onMouseClicked="#pdfViewPagination_onMouseClick" onScroll="#pdfViewPagination_OnScroll" onSwipeLeft="#pdfViewPagination_OnScroll" onSwipeRight="#pdfViewPagination_OnScroll" stylesheets="@../css/TokenTool.css">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
