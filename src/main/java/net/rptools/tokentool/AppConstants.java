@@ -11,6 +11,7 @@ package net.rptools.tokentool;
 import java.io.File;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class AppConstants {
@@ -52,14 +53,15 @@ public class AppConstants {
 
 	// From FXML, set by controller
 	public static Image DEFAULT_PORTRAIT_IMAGE;
+	public static ImageView DEFAULT_BACKGROUND_IMAGE_VIEW;
 	public static Image DEFAULT_MASK_IMAGE;
 	public static Image DEFAULT_OVERLAY_IMAGE;
 	public static double DEFAULT_PORTRAIT_IMAGE_X;
 	public static double DEFAULT_PORTRAIT_IMAGE_Y;
 	public static double DEFAULT_PORTRAIT_IMAGE_SCALE;
 	public static double DEFAULT_PORTRAIT_IMAGE_ROTATE;
-	public static final double WINDOW_WIDTH = 800;
-	public static final double WINDOW_HEIGHT = 800;
+	public static final double WINDOW_WIDTH = 825;
+	public static final double WINDOW_HEIGHT = 825;
 
 	public static final File OVERLAY_DIR = AppSetup.getAppHome("overlays");
 	public static final File CACHE_DIR = AppSetup.getAppHome("cache");

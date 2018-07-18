@@ -39,7 +39,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.rptools.tokentool.controller.TokenTool_Controller">
 	<center>
-		<VBox prefHeight="800.0" prefWidth="800.0">
+		<VBox prefHeight="825.0" prefWidth="825.0">
 			<children>
 				<MenuBar VBox.vgrow="NEVER">
 					<menus>
@@ -97,20 +97,20 @@
 					<children>
 						<StackPane styleClass="composite-view-checkered" HBox.hgrow="ALWAYS">
 							<children>
-								<StackPane fx:id="compositeTokenPane" focusTraversable="true" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragEntered="#compositeTokenPane_DragEntered" onDragExited="#compositeTokenPane_DragExited" onDragOver="#compositeTokenPane_DragOver" onKeyPressed="#compositeTokenPane_KeyPressed" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
+								<StackPane fx:id="compositeTokenPane" focusTraversable="true" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragExited="#compositeTokenPane_DragExited" onDragOver="#compositeTokenPane_DragOver" onKeyPressed="#compositeTokenPane_KeyPressed" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
 									<children>
-                              <ScrollPane fx:id="backgroundImagePane" hbarPolicy="NEVER" layoutX="10.0" layoutY="10.0" vbarPolicy="NEVER">
-                                 <content>
-                                    <ImageView fx:id="backgroundImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                                 </content>
-                              </ScrollPane>
 										<ScrollPane fx:id="portraitScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER">
                                  <content>
-												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.65" scaleY="0.65" translateX="15.0" translateY="100.0">
-													<image>
-														<Image url="@../image/creative_commons_portrait.png" />
-													</image>
-												</ImageView>
+                                    <StackPane fx:id="imagesStackPane" prefHeight="769.0" prefWidth="571.0">
+                                       <children>
+                                          <ImageView fx:id="backgroundImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" />
+      												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.65" scaleY="0.65" translateX="49.0" translateY="128.0">
+      													<image>
+      														<Image url="@../image/creative_commons_portrait.png" />
+      													</image>
+      												</ImageView>
+                                       </children>
+                                    </StackPane>
                                  </content>
 										</ScrollPane>
 										<Group fx:id="compositeGroup">
@@ -127,8 +127,10 @@
 												</ImageView>
 											</children>
 										</Group>
-										<Pane fx:id="dndHighlights" />
-										<AnchorPane fx:id="actionPane">
+      										<Pane fx:id="dndHighlights" />
+									</children>
+								</StackPane>
+										<AnchorPane fx:id="actionPane" pickOnBounds="false">
 											<children>
 												<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
 													<items>
@@ -157,8 +159,6 @@
 												</MenuButton>
 											</children>
 										</AnchorPane>
-									</children>
-								</StackPane>
 							</children>
 						</StackPane>
 						<VBox alignment="TOP_CENTER" spacing="5.0">
@@ -300,7 +300,7 @@
 																				<TreeView fx:id="overlayTreeView" prefWidth="50.0" showRoot="false" VBox.vgrow="ALWAYS" />
 																				<HBox>
 																					<children>
-																						<FlowPane hgap="10.0" prefWidth="187.0" vgap="10.0">
+																						<FlowPane hgap="10.0" minWidth="200.0" prefWidth="200.0" vgap="10.0">
 																							<children>
 																								<CheckBox fx:id="overlayUseAsBaseCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_OnAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.use_as_base" />
 																								<CheckBox fx:id="clipPortraitCheckbox" mnemonicParsing="false" onAction="#overlayUseAsBaseCheckbox_OnAction" styleClass="controls-padding" text="%options.pane.overlay.checkbox.clip_portrait" />

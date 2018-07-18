@@ -8,9 +8,6 @@
  */
 package net.rptools.tokentool.model;
 
-import java.awt.DisplayMode;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.EOFException;

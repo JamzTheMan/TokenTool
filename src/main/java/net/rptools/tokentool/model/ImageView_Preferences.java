@@ -103,11 +103,11 @@ public class ImageView_Preferences {
 	public ImageView toImageView(ImageView imageView) {
 		if (filePath != null) {
 			try {
-				log.info("Loading image from preferences " + filePath);
-				imageView.setImage(new Image(new File(filePath).toURI().toURL().toExternalForm()));
-				log.info("image width " + imageView.getImage().getWidth());
-				imageView.setFitWidth(imageView.getImage().getWidth());
-				imageView.setFitHeight(imageView.getImage().getHeight());
+				log.debug("Loading image from preferences " + filePath);
+				Image image = new Image(new File(filePath).toURI().toURL().toExternalForm());
+				imageView.setImage(image);
+				imageView.setFitWidth(image.getWidth());
+				imageView.setFitHeight(image.getHeight());
 			} catch (MalformedURLException e) {
 				log.error("Unable to load image " + filePath, e);
 			}
@@ -124,7 +124,7 @@ public class ImageView_Preferences {
 
 	public String toJson() {
 		String json = new Gson().toJson(this).toString();
-		log.info("JSON output: " + json);
+		log.debug("JSON output: " + json);
 		return json;
 	}
 }

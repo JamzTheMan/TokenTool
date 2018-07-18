@@ -79,7 +79,7 @@ public class Window_Preferences {
 
 	public String toJson() {
 		String json = new Gson().toJson(this).toString();
-		log.info("JSON output: " + json);
+		log.debug("JSON output: " + json);
 		return json;
 	}
 }

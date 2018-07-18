@@ -21,6 +21,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableSet;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,6 +50,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -67,6 +70,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
@@ -124,7 +128,6 @@ public class TokenTool_Controller {
 
 	@FXML private StackPane compositeTokenPane;
 	@FXML private BorderPane tokenPreviewPane;
-	@FXML private ScrollPane backgroundImagePane;
 	@FXML private ScrollPane portraitScrollPane;
 
 	@FXML private Group compositeGroup;
@@ -132,6 +135,7 @@ public class TokenTool_Controller {
 
 	@FXML private TreeView<Path> overlayTreeView;
 
+	@FXML private StackPane imagesStackPane;
 	@FXML private ImageView backgroundImageView; // The background image layer
 	@FXML private ImageView portraitImageView; // The bottom "Portrait" layer
 	@FXML private ImageView maskImageView; // The mask layer used to crop the Portrait layer
@@ -187,8 +191,9 @@ public class TokenTool_Controller {
 		}
 	};
 
-	private Point dragStart = new Point();
-	private Point portraitImageStart = new Point();
+	private static Point dragStart = new Point();
+	private static Point currentImageOffset = new Point();
+
 	private FileSaveUtil fileSaveUtil = new FileSaveUtil();
 
 	// A custom set of Width/Height sizes to use for Overlays
@@ -214,7 +219,6 @@ public class TokenTool_Controller {
 		assert backgroundOptionsPane != null : "fx:id=\"backgroundOptionsPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert zoomOptionsPane != null : "fx:id=\"zoomOptionsPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
-		assert backgroundImagePane != null : "fx:id=\"backgroundImagePane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert compositeTokenPane != null : "fx:id=\"compositeTokenPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert tokenPreviewPane != null : "fx:id=\"tokenPreviewPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert portraitScrollPane != null : "fx:id=\"portraitScrollPane\" was not injected: check your FXML file 'TokenTool.fxml'.";
@@ -258,9 +262,9 @@ public class TokenTool_Controller {
 		assert overlayMenuItem != null : "fx:id=\"overlayMenuItem\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		// We're getting the defaults set by the FXML before updating them with the saved preferences...
-		AppConstants.DEFAULT_PORTRAIT_IMAGE = portraitImageView.getImage();
 		AppConstants.DEFAULT_MASK_IMAGE = maskImageView.getImage();
 		AppConstants.DEFAULT_OVERLAY_IMAGE = overlayImageView.getImage();
+		AppConstants.DEFAULT_PORTRAIT_IMAGE = portraitImageView.getImage();
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_X = portraitImageView.getTranslateX();
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_Y = portraitImageView.getTranslateY();
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_SCALE = portraitImageView.getScaleY();
@@ -352,6 +356,11 @@ public class TokenTool_Controller {
 				.addListener((observable, oldValue, newValue) -> overlayWidthSpinner_onTextChanged(oldValue, newValue));
 		overlayHeightSpinner.valueProperty().addListener(
 				(observable, oldValue, newValue) -> overlayHeightSpinner_onTextChanged(oldValue, newValue));
+
+		// Bind the background/portrait pane widths to keep things centered.
+		// Otherwise StackPane sets width/height to largest value from the ImageView nodes within it
+		imagesStackPane.minWidthProperty().bind(compositeTokenPane.widthProperty());
+		imagesStackPane.minHeightProperty().bind(compositeTokenPane.heightProperty());
 	}
 
 	@FXML
@@ -511,6 +520,18 @@ public class TokenTool_Controller {
 
 	@FXML
 	void helpResetMenu_OnAction(ActionEvent event) {
+		String confirmationText = I18N.getString("TokenTool.dialog.reset.confirmation.text");
+
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle(I18N.getString("TokenTool.dialog.reset.confirmation.title"));
+		alert.setContentText(confirmationText);
+
+		Optional<ButtonType> result = alert.showAndWait();
+
+		if (!((result.isPresent()) && (result.get() == ButtonType.OK)))
+			return;
+
+		// OK, reset everything!
 		AppPreferences.removeAllPreferences();
 		AppPreferences.restorePreferences(this);
 
@@ -594,7 +615,7 @@ public class TokenTool_Controller {
 
 			getCurrentLayer().setTranslateX(x);
 			getCurrentLayer().setTranslateY(y);
-			portraitImageStart.setLocation(x, y);
+			currentImageOffset.setLocation(x, y);
 
 			updateTokenPreviewImageView();
 
@@ -611,8 +632,8 @@ public class TokenTool_Controller {
 
 	@FXML
 	void compositeTokenPane_MouseDragged(MouseEvent event) {
-		getCurrentLayer().setTranslateX(event.getX() - dragStart.x + portraitImageStart.x);
-		getCurrentLayer().setTranslateY(event.getY() - dragStart.y + portraitImageStart.y);
+		getCurrentLayer().setTranslateX(event.getX() - dragStart.x + currentImageOffset.x);
+		getCurrentLayer().setTranslateY(event.getY() - dragStart.y + currentImageOffset.y);
 
 		updateTokenPreviewImageView();
 	}
@@ -620,7 +641,7 @@ public class TokenTool_Controller {
 	@FXML
 	void compositeTokenPane_MousePressed(MouseEvent event) {
 		dragStart.setLocation(event.getX(), event.getY());
-		portraitImageStart.setLocation(getCurrentLayer().getTranslateX(), getCurrentLayer().getTranslateY());
+		currentImageOffset.setLocation(getCurrentLayer().getTranslateX(), getCurrentLayer().getTranslateY());
 		portraitImageView.setCursor(Cursor.MOVE);
 
 		// Get focus for arrow keys...
@@ -729,12 +750,11 @@ public class TokenTool_Controller {
 			updateImage(new Image(db.getUrl()), FileSaveUtil.searchURL(db.getUrl()));
 			event.setDropCompleted(true);
 		}
-
 	}
 
 	@FXML
 	void compositeTokenPane_DragDone(DragEvent event) {
-		updateTokenPreviewImageView(); // TODO: I don't think this is needed/called
+		updateTokenPreviewImageView();
 	}
 
 	@FXML
@@ -764,14 +784,7 @@ public class TokenTool_Controller {
 	}
 
 	@FXML
-	void compositeTokenPane_DragEntered(DragEvent event) {
-		log.info("compositeTokenPane_DragEntered");
-		// dndHighlights.setStyle("-fx-border-color: #00ff0055; -fx-border-width: 75px");
-	}
-
-	@FXML
 	void compositeTokenPane_DragExited(DragEvent event) {
-		log.info("compositeTokenPane_DragExited");
 		dndHighlights.setStyle("");
 	}
 
@@ -812,7 +825,7 @@ public class TokenTool_Controller {
 			portraitScrollPane.toBack();
 
 		// Always keep background image in back...
-		backgroundImagePane.toBack();
+		// backgroundImagePane.toBack();
 
 		updateTokenPreviewImageView();
 	}
@@ -1052,17 +1065,12 @@ public class TokenTool_Controller {
 	}
 
 	private void updateBackground(Image newBackgroundImage) {
-		double w = newBackgroundImage.getWidth();
-		double h = newBackgroundImage.getHeight();
-		double pw = backgroundImagePane.getWidth();
-		double ph = backgroundImagePane.getHeight();
-
 		backgroundImageView.setImage(newBackgroundImage);
 
-		backgroundImageView.setTranslateX((pw - w) / 2);
-		backgroundImageView.setTranslateY((ph - h) / 2);
-		backgroundImageView.setFitWidth(w);
-		backgroundImageView.setFitHeight(h);
+		backgroundImageView.setTranslateX(0);
+		backgroundImageView.setTranslateY(0);
+		backgroundImageView.setFitWidth(newBackgroundImage.getWidth());
+		backgroundImageView.setFitHeight(newBackgroundImage.getHeight());
 		backgroundImageView.setScaleX(1);
 		backgroundImageView.setScaleY(1);
 		backgroundImageView.setRotate(0d);
@@ -1071,15 +1079,10 @@ public class TokenTool_Controller {
 	}
 
 	private void updatePortrait(Image newPortraitImage) {
-		double w = newPortraitImage.getWidth();
-		double h = newPortraitImage.getHeight();
-		double pw = portraitScrollPane.getWidth();
-		double ph = portraitScrollPane.getHeight();
-
 		portraitImageView.setImage(newPortraitImage);
 
-		portraitImageView.setTranslateX((pw - w) / 2);
-		portraitImageView.setTranslateY((ph - h) / 2);
+		portraitImageView.setTranslateX(0);
+		portraitImageView.setTranslateY(0);
 		portraitImageView.setScaleX(1);
 		portraitImageView.setScaleY(1);
 		portraitImageView.setRotate(0d);
@@ -1353,14 +1356,6 @@ public class TokenTool_Controller {
 		fileNameSuffixTextField.setText(text);
 	}
 
-	public void updatePortraitLocation(double xDelta, double yDelta) {
-		if (xDelta != 0)
-			portraitImageView.setTranslateX(portraitImageView.getTranslateX() + (xDelta / 2));
-
-		if (yDelta != 0)
-			portraitImageView.setTranslateY(portraitImageView.getTranslateY() + (yDelta / 2));
-	}
-
 	// For user preferences...
 	public void setWindoFrom_Preferences(String preferencesJson) {
 		if (preferencesJson != null) {
@@ -1382,7 +1377,8 @@ public class TokenTool_Controller {
 			ImageView_Preferences imageView_Preferences = new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {}.getType());
 			portraitImageView = imageView_Preferences.toImageView(portraitImageView);
 		} else {
-			portraitImageView.setImage(AppConstants.DEFAULT_PORTRAIT_IMAGE);
+			log.info("here!");
+			// portraitImageView.setImage(AppConstants.DEFAULT_PORTRAIT_IMAGE);
 		}
 	}
 
