@@ -13,7 +13,7 @@
 		<Root level="INFO">
 			<AppenderRef ref="Console" level="DEBUG" />
 			<AppenderRef ref="LogFile" />
-			<appender-ref ref="Sentry" level="ERROR" />
+			<AppenderRef ref="Sentry" level="ERROR" />
 		</Root>
 	</Loggers>
 </Configuration>

@@ -24,9 +24,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.appender.FileAppender;
 
+import io.sentry.Sentry;
 import javafx.application.Application;
 import javafx.application.ConditionalFeature;
 import javafx.application.Platform;
@@ -68,11 +70,15 @@ public class TokenTool extends Application {
 
 	private static int overlayCount = 0;
 	private static int loadCount = 1;
-	private static double deltaX = 0;
-	private static double deltaY = 0;
 
 	private static TreeItem<Path> overlayTreeItems;
 	private static Stage stage;
+
+	static {
+		// This will inject additional data tags in log4j2 which will be picked up by Sentry.io
+		System.setProperty("log4j2.isThreadContextMapInheritable", "true");
+		ThreadContext.put("OS", System.getProperty("os.name")); // Added to the JavaFX Application Thread thread...
+	}
 
 	@Override
 	public void init() throws Exception {
@@ -88,6 +94,11 @@ public class TokenTool extends Application {
 		// Lets install/update the overlays if newer version
 		AppSetup.install(VERSION);
 		log = LogManager.getLogger(TokenTool.class);
+
+		// Log some basic info
+		log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
+		log.info("Release: " + Sentry.getStoredClient().getRelease());
+		log.info("OS: " + ThreadContext.get("OS"));
 		log.info("3D Hardware Available? " + Platform.isSupported(ConditionalFeature.SCENE3D));
 
 		// Now lets cache any overlays we find and update preLoader with progress
@@ -110,42 +121,6 @@ public class TokenTool extends Application {
 		primaryStage.setTitle(I18N.getString("TokenTool.stage.title"));
 		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(AppConstants.TOKEN_TOOL_ICON)));
 		primaryStage.setScene(scene);
-
-		primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-			if (Double.isNaN(oldVal.doubleValue()))
-				return;
-
-			deltaX += newVal.doubleValue() - oldVal.doubleValue();
-
-			// Only adjust on even width adjustments
-			if (deltaX > 1 || deltaX < -1) {
-				if (deltaX % 2 == 0) {
-					tokentool_Controller.updatePortraitLocation(deltaX, 0);
-					deltaX = 0;
-				} else {
-					tokentool_Controller.updatePortraitLocation(deltaX - 1, 0);
-					deltaX = 1;
-				}
-			}
-		});
-
-		primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
-			if (Double.isNaN(oldVal.doubleValue()))
-				return;
-
-			deltaY += newVal.doubleValue() - oldVal.doubleValue();
-
-			// Only adjust on even width adjustments
-			if (deltaY > 1 || deltaY < -1) {
-				if (deltaY % 2 == 0) {
-					tokentool_Controller.updatePortraitLocation(0, deltaY);
-					deltaY = 0;
-				} else {
-					tokentool_Controller.updatePortraitLocation(0, deltaY - 1);
-					deltaY = 1;
-				}
-			}
-		});
 
 		// Load all the overlays into the treeview
 		tokentool_Controller.updateOverlayTreeview(overlayTreeItems);
@@ -303,6 +278,7 @@ public class TokenTool extends Application {
 		VENDOR = getCommandLineStringOption(cmdOptions, "vendor", args);
 
 		System.setProperty("javafx.preloader", "net.rptools.tokentool.client.SplashScreenLoader");
+
 		launch(args);
 	}
 }

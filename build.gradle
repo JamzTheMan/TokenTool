@@ -53,10 +53,15 @@ ext {
 	if (tags) {
 		tagVersion = tags.getName()
 		msiVersion = tagVersion
+		enviroment = "Production"
+		sentryDSN = sentry_production_dsn
 	} else {
 		tagVersion = 'SNAPSHOT-' + revision
+		enviroment = "Development"
+		sentryDSN = sentry_development_dsn
 	}
 
+	// vendr, tagVersion, msiVersion, and DSN's defaults are set in gradle.properties
 	println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
 }
 
@@ -127,8 +132,8 @@ dependencies {
 	compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 	compile group: 'commons-logging', name: 'commons-logging', version: '1.2'
 
-	compile group: 'io.sentry', name: 'sentry', version: '1.6.1'
-	compile group: 'io.sentry', name: 'sentry-log4j2', version: '1.6.1'
+	compile group: 'io.sentry', name: 'sentry', version: '1.7.5'
+	compile group: 'io.sentry', name: 'sentry-log4j2', version: '1.7.5'
 
 	// For PDF image extraction
 	compile 'org.apache.pdfbox:pdfbox:2.0.10'
@@ -146,6 +151,19 @@ dependencies {
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'					// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'org.reflections', name: 'reflections', version: '0.9.10'			// https://mvnrepository.com/artifact/commons-cli/commons-cli
 	compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'				// https://mvnrepository.com/artifact/com.google.code.gson/gson
+}
+
+task configSentryRelease(type: Copy) {
+	from("build-resources/sentry.properties.template")
+	into("src/main/resources/")
+	rename("sentry.properties.template", "sentry.properties")
+	def tokens = [
+		AppVersion: "${tagVersion}",
+		Environment: "${enviroment}",
+		SentryDSN: "${sentryDSN}"
+	]
+	expand(tokens)
+	inputs.properties(tokens)
 }
 
 task uberJar(type: Jar) {
@@ -184,7 +202,7 @@ task copyPackageExtras(type: Copy) {
 }
 
 task prepareInnoSetup(type: Copy) {
-	from("package/windows/TokenTool.iss.template")
+	from("build-resources/TokenTool.iss.template")
 	into("package/windows/")
 	rename("TokenTool.iss.template", "TokenTool.iss")
 	def tokens = [
@@ -246,3 +264,6 @@ task deploy(dependsOn: [uberJar, copyPackageExtras, prepareInnoSetup]) {
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.8'
 }
+
+// Configure current release tag in Sentry.io properties
+processResources.dependsOn configSentryRelease
