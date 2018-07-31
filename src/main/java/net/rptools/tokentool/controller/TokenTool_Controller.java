@@ -143,12 +143,17 @@ public class TokenTool_Controller {
 	@FXML private ImageView tokenImageView; // The final token image created
 
 	@FXML private CheckBox useFileNumberingCheckbox;
+	@FXML private CheckBox useTokenNameCheckbox;
 	@FXML private CheckBox overlayUseAsBaseCheckbox;
 	@FXML private CheckBox clipPortraitCheckbox;
 
 	@FXML private TextField fileNameTextField;
 	@FXML private Label fileNameSuffixLabel;
 	@FXML private TextField fileNameSuffixTextField;
+	@FXML private TextField portraitNameTextField;
+	@FXML private Label portraitNameSuffixLabel;
+	@FXML private TextField portraitNameSuffixTextField;
+
 	@FXML private Label overlayNameLabel;
 	@FXML private ColorPicker backgroundColorPicker;
 	@FXML private ToggleButton overlayAspectToggleButton;
@@ -235,6 +240,7 @@ public class TokenTool_Controller {
 		assert tokenImageView != null : "fx:id=\"tokenImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert useFileNumberingCheckbox != null : "fx:id=\"useFileNumberingCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert useTokenNameCheckbox != null : "fx:id=\"useFileNumberingCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert overlayUseAsBaseCheckbox != null : "fx:id=\"overlayUseAsBaseCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert clipPortraitCheckbox != null : "fx:id=\"clipPortraitCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
@@ -299,6 +305,7 @@ public class TokenTool_Controller {
 			}
 		});
 
+		// Set filters and bindings for file name inputs
 		UnaryOperator<Change> filter = change -> {
 			String text = change.getText();
 
@@ -312,10 +319,25 @@ public class TokenTool_Controller {
 			//
 			// return null;
 		};
-		TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-		fileNameTextField.setTextFormatter(textFormatter);
 
-		// Effects
+		fileNameTextField.setTextFormatter(new TextFormatter<>(filter));
+		portraitNameTextField.setTextFormatter(new TextFormatter<>(filter));
+		portraitNameTextField.textProperty().bind(fileNameTextField.textProperty().concat(portraitNameSuffixTextField.textProperty()));
+		
+		// Bind portrait name to token name if useTokenNameCheckbox is checked
+		portraitNameTextField.disableProperty().bind(useTokenNameCheckbox.selectedProperty());
+		portraitNameSuffixLabel.disableProperty().bind(useTokenNameCheckbox.selectedProperty().not());
+		portraitNameSuffixTextField.disableProperty().bind(useTokenNameCheckbox.selectedProperty().not());
+		
+		useTokenNameCheckbox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+			if (isNowSelected) {
+				portraitNameTextField.textProperty().bind(fileNameTextField.textProperty().concat(portraitNameSuffixTextField.textProperty()));
+			} else {
+				portraitNameTextField.textProperty().unbind();
+			}
+		});
+
+		/* Effects */
 		GaussianBlur gaussianBlur = new GaussianBlur(0);
 		Glow glow = new Glow(0);
 		gaussianBlur.setInput(glow);
@@ -1049,6 +1071,15 @@ public class TokenTool_Controller {
 		});
 	}
 
+	public void updateImage(Image image, String imageName, boolean setBackground) {
+		if (setBackground)
+			backgroundMenuItem.fire();
+		else
+			portraitMenuItem.fire();
+
+		updateImage(image, imageName);
+	}
+
 	public void updateImage(Image image) {
 		updateImage(image, null);
 	}
@@ -1432,5 +1463,4 @@ public class TokenTool_Controller {
 			Platform.exit();
 		}
 	}
-
 }

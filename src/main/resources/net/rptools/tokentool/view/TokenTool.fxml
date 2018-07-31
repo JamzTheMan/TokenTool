@@ -185,7 +185,7 @@
 											<children>
 												<Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 													<panes>
-														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.portrait">
+														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.background.title">
 															<content>
 																<VBox spacing="5.0">
 																	<children>
@@ -205,39 +205,47 @@
 																				<Font size="11.0" />
 																			</font>
 																		</Button>
-																		<Label layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.effects">
-																			<VBox.margin>
-																				<Insets top="20.0" />
-																			</VBox.margin>
-																		</Label>
-																		<Separator prefWidth="200.0">
-																			<VBox.margin>
-																				<Insets />
-																			</VBox.margin>
-																		</Separator>
-																		<Label text="%options.pane.portrait.label.Opacity">
-																			<VBox.margin>
-																				<Insets top="10.0" />
-																			</VBox.margin>
-																		</Label>
-																		<Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
-																		<Label text="%options.pane.portrait.label.Gaussian_Blur">
-																			<VBox.margin>
-																				<Insets />
-																			</VBox.margin>
-																		</Label>
-																		<Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
-																		<Label text="%options.pane.portrait.label.Glow" />
-																		<Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
 																	</children>
 																</VBox>
 															</content>
 														</TitledPane>
+                                          <TitledPane fx:id="portraitOptionsPane" expanded="false" layoutX="10.0" layoutY="10.0" text="%options.pane.portrait.title">
+                                             <content>
+                                                <VBox spacing="5.0">
+                                                   <children>
+                                                      <Label layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.effects">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Separator prefWidth="200.0">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Separator>
+                                                      <Label text="%options.pane.portrait.label.Opacity">
+                                                         <VBox.margin>
+                                                            <Insets top="10.0" />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
+                                                      <Label text="%options.pane.portrait.label.Gaussian_Blur">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
+                                                      <Label text="%options.pane.portrait.label.Glow" />
+                                                      <Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
+                                                   </children>
+                                                </VBox>
+                                             </content>
+                                          </TitledPane>
 														<TitledPane fx:id="saveOptionsPane" expanded="false" text="%options.pane.naming">
 															<content>
 																<VBox spacing="10.0">
 																	<children>
-																		<Label styleClass="controls-label" text="%controls.filenameLabel.text">
+																		<Label styleClass="controls-label" text="%controls.token.filenameLabel.text">
 																			<opaqueInsets>
 																				<Insets />
 																			</opaqueInsets>
@@ -263,6 +271,31 @@
 																				<Insets />
 																			</VBox.margin>
 																		</HBox>
+                                                      <Separator prefWidth="210.0">
+                                                         <VBox.margin>
+                                                            <Insets top="10.0" />
+                                                         </VBox.margin>
+                                                      </Separator>
+                                                      <Label styleClass="controls-label" text="%controls.portrait.filenameLabel.text">
+                                                         <opaqueInsets>
+                                                            <Insets />
+                                                         </opaqueInsets>
+                                                      </Label>
+                                                      <TextField fx:id="portraitNameTextField" disable="true" maxWidth="1.7976931348623157E308" text="token" />
+                                                      <CheckBox fx:id="useTokenNameCheckbox" mnemonicParsing="false" selected="true" styleClass="controls" text="%controls.useTokenNameCheckbox.text" />
+                                                      <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                                         <children>
+                                                            <Label fx:id="portraitNameSuffixLabel" styleClass="controls-label" text="%controls.portraitNameSuffixLabel.text" />
+                                                            <TextField fx:id="portraitNameSuffixTextField" prefColumnCount="3" text=" [Portrait]" HBox.hgrow="ALWAYS">
+                                                               <HBox.margin>
+                                                                  <Insets />
+                                                               </HBox.margin>
+                                                               <tooltip>
+                                                                  <Tooltip text="%controls.portraitNameSuffixLabel.tooltip" />
+                                                               </tooltip>
+                                                            </TextField>
+                                                         </children>
+                                                      </HBox>
 																	</children>
 																</VBox>
 															</content>

@@ -26,6 +26,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceDictionary;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
+
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 
@@ -37,6 +38,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.TilePane;
 import net.rptools.tokentool.controller.TokenTool_Controller;
@@ -192,15 +195,7 @@ public final class ExtractImagesFromPDF {
 		imageButton.getStyleClass().add("overlay-toggle-button");
 		imageButton.setGraphic(imageViewNode);
 
-		// just clicking button will update Portrait image...
-		imageButton.addEventHandler(ActionEvent.ACTION, event -> {
-			imageButton.setSelected(true);
-
-			tokenTool_Controller.updateImage(imageViewNode.getImage(), imageName);
-			event.consume();
-		});
-
-		// Can also drag image to tokentool panel OR any other place, like MapTool!
+		// Can also drag image to TokenTool pane OR any other place, like MapTool!
 		imageButton.setOnDragDetected(event -> {
 			Dragboard db = imageButton.startDragAndDrop(TransferMode.ANY);
 			ClipboardContent content = new ClipboardContent();
@@ -221,6 +216,21 @@ public final class ExtractImagesFromPDF {
 				db.setContent(content);
 				event.consume();
 			}
+			event.consume();
+		});
+		
+		// Right click sets background vs portrait... 
+		// Drag will consume the event first so image doesn't reset...
+		imageButton.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+			imageButton.setSelected(true);
+			tokenTool_Controller.updateImage(imageViewNode.getImage(), imageName, event.getButton().equals(MouseButton.SECONDARY));
+			event.consume();
+		});
+		
+		// capture other actions like touch, focus+spacebar, etc
+		imageButton.addEventHandler(ActionEvent.ACTION, event -> {
+			imageButton.setSelected(true);
+			tokenTool_Controller.updateImage(imageViewNode.getImage(), imageName);
 			event.consume();
 		});
 
