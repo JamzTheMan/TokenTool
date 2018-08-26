@@ -45,7 +45,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -71,12 +70,14 @@ public class ImageUtil {
 	private static ImageView getImage(ImageView thumbView, final Path filePath, final boolean overlayWanted, final int THUMB_SIZE) throws IOException {
 		Image thumb = null;
 		String fileURL = filePath.toUri().toURL().toString();
-
+		
+		if (THUMB_SIZE > 0) {
+			thumbView.setFitWidth(THUMB_SIZE);
+			thumbView.setPreserveRatio(true);
+		}
+		
 		if (ImageUtil.SUPPORTED_IMAGE_FILE_FILTER.accept(null, fileURL)) {
-			if (THUMB_SIZE <= 0)
-				thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
-			else
-				thumb = processMagenta(new Image(fileURL, THUMB_SIZE, THUMB_SIZE, true, true), COLOR_THRESHOLD, overlayWanted);
+			thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
 		} else if (ImageUtil.PSD_FILE_FILTER.accept(null, fileURL)) {
 			ImageInputStream is = null;
 			PSDImageReader reader = null;
@@ -126,12 +127,6 @@ public class ImageUtil {
 
 					// Lets pad the overlay with transparency to make it the same size as the PSD canvas size
 					thumb = resizeCanvas(SwingFXUtils.toFXImage(thumbBI, null), width, height, x, y);
-
-					// Finally set ImageView to thumbnail size
-					if (THUMB_SIZE > 0) {
-						thumbView.setFitWidth(THUMB_SIZE);
-						thumbView.setPreserveRatio(true);
-					}
 				}
 			} catch (Exception e) {
 				log.error("Processing: " + file.getAbsolutePath(), e);
@@ -255,13 +250,17 @@ public class ImageUtil {
 	}
 
 	public static Image composePreview(StackPane compositeTokenPane, ImageView backgroundImageView, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,
-			boolean useAsBase,
-			boolean clipImage) {
+			boolean useAsBase, boolean clipImage) {
+
 		// Process layout as maskImage may have changed size if the overlay was changed
 		compositeTokenPane.layout();
 		SnapshotParameters parameter = new SnapshotParameters();
 		Image finalImage = null;
 		Group blend;
+
+		// check if there is a mask image
+		if (maskImageView.getFitWidth() <= 0 || maskImageView.getFitHeight() <= 0)
+			clipImage = false;
 
 		if (clipImage) {
 			// We need to clip the portrait image first then blend the overlay image over it
@@ -352,7 +351,6 @@ public class ImageUtil {
 					pixelWriter.setColor(readX, readY, Color.TRANSPARENT);
 				else
 					pixelWriter.setColor(readX, readY, pixelColor);
-
 			}
 		}
 
