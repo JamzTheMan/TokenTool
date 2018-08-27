@@ -19,6 +19,7 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleButton?>
@@ -86,8 +87,8 @@
 						</Menu>
 						<Menu fx:id="helpAboutMenu" text="%menu.title.help">
 							<items>
-                        <MenuItem fx:id="helpResetMenu" onAction="#helpResetMenu_OnAction" text="%menu.title.help.reset" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
+								<MenuItem fx:id="helpResetMenu" onAction="#helpResetMenu_OnAction" text="%menu.title.help.reset" />
+								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="helpAboutMenu" onAction="#helpAboutMenu_OnAction" text="%menu.title.help.about" />
 							</items>
 						</Menu>
@@ -100,18 +101,18 @@
 								<StackPane fx:id="compositeTokenPane" focusTraversable="true" onDragDone="#compositeTokenPane_DragDone" onDragDropped="#compositeTokenPane_DragDropped" onDragExited="#compositeTokenPane_DragExited" onDragOver="#compositeTokenPane_DragOver" onKeyPressed="#compositeTokenPane_KeyPressed" onMouseDragged="#compositeTokenPane_MouseDragged" onMouseEntered="#compositeTokenPane_MouseEntered" onMouseExited="#compositeTokenPane_MouseExited" onMousePressed="#compositeTokenPane_MousePressed" onMouseReleased="#compositeTokenPane_MouseReleased" onRotate="#compositeTokenPane_OnRotate" onScroll="#compositeTokenPane_OnScroll" onZoom="#compositeTokenPane_OnZoom">
 									<children>
 										<ScrollPane fx:id="portraitScrollPane" hbarPolicy="NEVER" vbarPolicy="NEVER">
-                                 <content>
-                                    <StackPane fx:id="imagesStackPane" prefHeight="769.0" prefWidth="571.0">
-                                       <children>
-                                          <ImageView fx:id="backgroundImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" />
-      												<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.65" scaleY="0.65" translateX="49.0" translateY="128.0">
-      													<image>
-      														<Image url="@../image/creative_commons_portrait.png" />
-      													</image>
-      												</ImageView>
-                                       </children>
-                                    </StackPane>
-                                 </content>
+											<content>
+												<StackPane fx:id="imagesStackPane" prefHeight="769.0" prefWidth="571.0">
+													<children>
+														<ImageView fx:id="backgroundImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" />
+														<ImageView fx:id="portraitImageView" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" scaleX="0.65" scaleY="0.65" translateX="49.0" translateY="128.0">
+															<image>
+																<Image url="@../image/creative_commons_portrait.png" />
+															</image>
+														</ImageView>
+													</children>
+												</StackPane>
+											</content>
 										</ScrollPane>
 										<Group fx:id="compositeGroup">
 											<children>
@@ -127,38 +128,38 @@
 												</ImageView>
 											</children>
 										</Group>
-      										<Pane fx:id="dndHighlights" />
+										<Pane fx:id="dndHighlights" />
 									</children>
 								</StackPane>
-										<AnchorPane fx:id="actionPane" pickOnBounds="false">
-											<children>
-												<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-													<items>
-														<RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" onAction="#backgroundMenuItem_OnAction" text="Background">
-															<accelerator>
-																<KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-															</accelerator>
-															<toggleGroup>
-																<ToggleGroup fx:id="selectedLayer" />
-															</toggleGroup>
-														</RadioMenuItem>
-														<RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" onAction="#portraitMenuItem_OnAction" selected="true" text="Portrait" toggleGroup="$selectedLayer">
-															<accelerator>
-																<KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-															</accelerator>
-														</RadioMenuItem>
-														<RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer" visible="false">
-															<accelerator>
-																<KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-															</accelerator>
-														</RadioMenuItem>
-													</items>
-													<font>
-														<Font name="System Bold Italic" size="14.0" />
-													</font>
-												</MenuButton>
-											</children>
-										</AnchorPane>
+								<AnchorPane fx:id="actionPane" pickOnBounds="false">
+									<children>
+										<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+											<items>
+												<RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" onAction="#backgroundMenuItem_OnAction" text="Background">
+													<accelerator>
+														<KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+													</accelerator>
+													<toggleGroup>
+														<ToggleGroup fx:id="selectedLayer" />
+													</toggleGroup>
+												</RadioMenuItem>
+												<RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" onAction="#portraitMenuItem_OnAction" selected="true" text="Portrait" toggleGroup="$selectedLayer">
+													<accelerator>
+														<KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+													</accelerator>
+												</RadioMenuItem>
+												<RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer" visible="false">
+													<accelerator>
+														<KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+													</accelerator>
+												</RadioMenuItem>
+											</items>
+											<font>
+												<Font name="System Bold Italic" size="14.0" />
+											</font>
+										</MenuButton>
+									</children>
+								</AnchorPane>
 							</children>
 						</StackPane>
 						<VBox alignment="TOP_CENTER" spacing="5.0">
@@ -185,62 +186,6 @@
 											<children>
 												<Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 													<panes>
-														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.background.title">
-															<content>
-																<VBox spacing="5.0">
-																	<children>
-																		<Label maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.Background_Color">
-																			<VBox.margin>
-																				<Insets bottom="-4.0" />
-																			</VBox.margin>
-																		</Label>
-																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_OnAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
-																		<Button fx:id="removeBackgroundColorButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundColorButton_OnAction" text="%options.pane.portrait.button.Remove_Background_Color">
-																			<font>
-																				<Font size="11.0" />
-																			</font>
-																		</Button>
-																		<Button fx:id="changeBackgroundImageButton" layoutX="20.0" layoutY="68.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeBackgroundImageButton_OnAction" text="%options.pane.portrait.button.Add_Background_Image">
-																			<font>
-																				<Font size="11.0" />
-																			</font>
-																		</Button>
-																	</children>
-																</VBox>
-															</content>
-														</TitledPane>
-                                          <TitledPane fx:id="portraitOptionsPane" expanded="false" layoutX="10.0" layoutY="10.0" text="%options.pane.portrait.title">
-                                             <content>
-                                                <VBox spacing="5.0">
-                                                   <children>
-                                                      <Label layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.effects">
-                                                         <VBox.margin>
-                                                            <Insets />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <Separator prefWidth="200.0">
-                                                         <VBox.margin>
-                                                            <Insets />
-                                                         </VBox.margin>
-                                                      </Separator>
-                                                      <Label text="%options.pane.portrait.label.Opacity">
-                                                         <VBox.margin>
-                                                            <Insets top="10.0" />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
-                                                      <Label text="%options.pane.portrait.label.Gaussian_Blur">
-                                                         <VBox.margin>
-                                                            <Insets />
-                                                         </VBox.margin>
-                                                      </Label>
-                                                      <Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
-                                                      <Label text="%options.pane.portrait.label.Glow" />
-                                                      <Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
-                                                   </children>
-                                                </VBox>
-                                             </content>
-                                          </TitledPane>
 														<TitledPane fx:id="saveOptionsPane" expanded="false" text="%options.pane.naming">
 															<content>
 																<VBox spacing="10.0">
@@ -257,7 +202,10 @@
 																		<CheckBox fx:id="useFileNumberingCheckbox" mnemonicParsing="false" onAction="#useFileNumberingCheckbox_OnAction" styleClass="controls" text="%controls.useFileNumberingCheckbox.text" />
 																		<HBox alignment="CENTER_LEFT" spacing="5.0">
 																			<children>
-																				<Label fx:id="fileNameSuffixLabel" disable="true" styleClass="controls-label" text="%controls.filenameSuffixLabel.text" />
+																				<Label fx:id="fileNameSuffixLabel" disable="true" styleClass="controls-label" text="%controls.filenameSuffixLabel.text">
+                                                               <HBox.margin>
+                                                                  <Insets left="20.0" />
+                                                               </HBox.margin></Label>
 																				<TextField fx:id="fileNameSuffixTextField" disable="true" prefColumnCount="3" text="0001" HBox.hgrow="ALWAYS">
 																					<HBox.margin>
 																						<Insets />
@@ -271,31 +219,137 @@
 																				<Insets />
 																			</VBox.margin>
 																		</HBox>
-                                                      <Separator prefWidth="210.0">
-                                                         <VBox.margin>
-                                                            <Insets top="10.0" />
-                                                         </VBox.margin>
-                                                      </Separator>
-                                                      <Label styleClass="controls-label" text="%controls.portrait.filenameLabel.text">
-                                                         <opaqueInsets>
-                                                            <Insets />
-                                                         </opaqueInsets>
-                                                      </Label>
-                                                      <TextField fx:id="portraitNameTextField" disable="true" maxWidth="1.7976931348623157E308" text="token" />
-                                                      <CheckBox fx:id="useTokenNameCheckbox" mnemonicParsing="false" selected="true" styleClass="controls" text="%controls.useTokenNameCheckbox.text" />
-                                                      <HBox alignment="CENTER_LEFT" spacing="5.0">
-                                                         <children>
-                                                            <Label fx:id="portraitNameSuffixLabel" styleClass="controls-label" text="%controls.portraitNameSuffixLabel.text" />
-                                                            <TextField fx:id="portraitNameSuffixTextField" prefColumnCount="3" text=" [Portrait]" HBox.hgrow="ALWAYS">
+																		<Separator prefWidth="210.0">
+																			<VBox.margin>
+																				<Insets top="10.0" />
+																			</VBox.margin>
+																		</Separator>
+																		<Label styleClass="controls-label" text="%controls.portrait.filenameLabel.text">
+																			<opaqueInsets>
+																				<Insets />
+																			</opaqueInsets>
+																		</Label>
+																		<TextField fx:id="portraitNameTextField" disable="true" maxWidth="1.7976931348623157E308" text="token" />
+																		<CheckBox fx:id="useTokenNameCheckbox" mnemonicParsing="false" selected="true" styleClass="controls" text="%controls.useTokenNameCheckbox.text" />
+																		<HBox alignment="CENTER_LEFT" spacing="5.0">
+																			<children>
+																				<Label fx:id="portraitNameSuffixLabel" styleClass="controls-label" text="%controls.portraitNameSuffixLabel.text">
                                                                <HBox.margin>
-                                                                  <Insets />
-                                                               </HBox.margin>
-                                                               <tooltip>
-                                                                  <Tooltip text="%controls.portraitNameSuffixLabel.tooltip" />
-                                                               </tooltip>
-                                                            </TextField>
-                                                         </children>
-                                                      </HBox>
+                                                                  <Insets left="20.0" />
+                                                               </HBox.margin></Label>
+																				<TextField fx:id="portraitNameSuffixTextField" prefColumnCount="3" text=" [Portrait]" HBox.hgrow="ALWAYS">
+																					<HBox.margin>
+																						<Insets />
+																					</HBox.margin>
+																					<tooltip>
+																						<Tooltip text="%controls.portraitNameSuffixLabel.tooltip" />
+																					</tooltip>
+																				</TextField>
+																			</children>
+																		</HBox>
+																		<Separator layoutX="20.0" layoutY="146.0" prefWidth="210.0">
+																			<opaqueInsets>
+																				<Insets />
+																			</opaqueInsets>
+																			<VBox.margin>
+																				<Insets top="10.0" />
+																			</VBox.margin>
+																		</Separator>
+																		<CheckBox fx:id="savePortraitOnDragCheckbox" layoutX="20.0" layoutY="74.0" mnemonicParsing="false" styleClass="controls" text="%controls.save_portrait.text">
+																			<tooltip>
+																				<Tooltip text="%controls.save_portrait.tooltip">
+																					<font>
+																						<Font size="14.0" />
+																					</font>
+																				</Tooltip>
+																			</tooltip>
+																		</CheckBox>
+																		<CheckBox fx:id="useBackgroundOnDragCheckbox" disable="true" layoutX="20.0" layoutY="306.0" mnemonicParsing="false" styleClass="controls" text="%controls.use_background.text">
+																			<tooltip>
+																				<Tooltip text="%controls.use_background.tooltip">
+																					<font>
+																						<Font size="14.0" />
+																					</font>
+																				</Tooltip>
+																			</tooltip>
+                                                         <VBox.margin>
+                                                            <Insets left="20.0" />
+                                                         </VBox.margin>
+																		</CheckBox>
+																	</children>
+																</VBox>
+															</content>
+														</TitledPane>
+														<TitledPane fx:id="backgroundOptionsPane" expanded="false" text="%options.pane.background.title">
+															<content>
+																<VBox spacing="5.0">
+																	<children>
+																		<Label maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.Background_Color">
+																			<VBox.margin>
+																				<Insets bottom="-4.0" />
+																			</VBox.margin>
+																		</Label>
+																		<ColorPicker fx:id="backgroundColorPicker" editable="true" maxWidth="1.7976931348623157E308" minWidth="180.0" onAction="#backgroundColorPicker_OnAction" promptText="%options.pane.portrait.color.prompt" VBox.vgrow="ALWAYS" />
+																		<Button fx:id="removeBackgroundColorButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundColorButton_OnAction" text="%options.pane.portrait.button.remove_Background_Color">
+																			<font>
+																				<Font size="11.0" />
+																			</font>
+																		</Button>
+																		<Button fx:id="changeBackgroundImageButton" layoutX="20.0" layoutY="68.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changeBackgroundImageButton_OnAction" text="%options.pane.portrait.button.add_Background_Image">
+																			<font>
+																				<Font size="11.0" />
+																			</font>
+																			<VBox.margin>
+																				<Insets top="20.0" />
+																			</VBox.margin>
+																		</Button>
+																		<Button fx:id="removeBackgroundImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeBackgroundImageButton_OnAction" text="%options.pane.portrait.button.remove_Background_Image">
+																			<font>
+																				<Font size="11.0" />
+																			</font>
+																		</Button>
+																	</children>
+																</VBox>
+															</content>
+														</TitledPane>
+														<TitledPane fx:id="portraitOptionsPane" expanded="false" layoutX="10.0" layoutY="10.0" text="%options.pane.portrait.title">
+															<content>
+																<VBox spacing="5.0">
+																	<children>
+																		<Button fx:id="changePortraitImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#changePortraitImageButton_OnAction" text="%options.pane.portrait.button.add_Portrait_Image">
+																			<font>
+																				<Font size="11.0" />
+																			</font>
+																		</Button>
+																		<Button fx:id="removePortraitImageButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removePortraitImageButton_OnAction" text="%options.pane.portrait.button.remove_Portrait_Image">
+																			<font>
+																				<Font size="11.0" />
+																			</font>
+																		</Button>
+																		<Label layoutX="20.0" layoutY="20.0" maxWidth="1.7976931348623157E308" text="%options.pane.portrait.label.effects">
+																			<VBox.margin>
+																				<Insets top="20.0" />
+																			</VBox.margin>
+																		</Label>
+																		<Separator prefWidth="200.0">
+																			<VBox.margin>
+																				<Insets />
+																			</VBox.margin>
+																		</Separator>
+																		<Label text="%options.pane.portrait.label.Opacity">
+																			<VBox.margin>
+																				<Insets top="10.0" />
+																			</VBox.margin>
+																		</Label>
+																		<Slider fx:id="portraitTransparencySlider" blockIncrement="0.5" majorTickUnit="1.0" max="1.0" minorTickCount="1" value="1.0" />
+																		<Label text="%options.pane.portrait.label.Gaussian_Blur">
+																			<VBox.margin>
+																				<Insets />
+																			</VBox.margin>
+																		</Label>
+																		<Slider fx:id="portraitBlurSlider" blockIncrement="0.25" majorTickUnit="2.0" max="63.0" minorTickCount="25" />
+																		<Label text="%options.pane.portrait.label.Glow" />
+																		<Slider fx:id="portraitGlowSlider" blockIncrement="0.1" majorTickUnit="1.0" max="1.0" minorTickCount="1" />
 																	</children>
 																</VBox>
 															</content>
@@ -361,8 +415,17 @@
 																					<children>
 																						<VBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
 																							<children>
-																								<Spinner fx:id="overlayWidthSpinner" editable="true" initialValue="256d" max="1000d" min="50d" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS" />
-																								<Spinner fx:id="overlayHeightSpinner" editable="true" initialValue="256d" max="1000d" min="50d" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS" />
+																								<Spinner fx:id="overlayWidthSpinner" editable="true" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS">
+																									<valueFactory>
+																										<SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="256" max="10000" min="50" />
+																									</valueFactory>
+																								</Spinner>
+																								<Spinner fx:id="overlayHeightSpinner" editable="true" styleClass="split-arrows-horizontal" VBox.vgrow="ALWAYS">
+																									<valueFactory>
+																										<SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="256" max="10000" min="50" />
+																									</valueFactory>
+
+																								</Spinner>
 																							</children>
 																						</VBox>
 																						<AnchorPane>

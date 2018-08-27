@@ -97,7 +97,7 @@ public class TokenTool extends Application {
 
 		// Log some basic info
 		log.info("Environment: " + Sentry.getStoredClient().getEnvironment());
-		if(!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production"))
+		if (!Sentry.getStoredClient().getEnvironment().toLowerCase().equals("production"))
 			log.info("Not in Produciton mode and thus will not log any events to Sentry.io");
 
 		log.info("Release: " + Sentry.getStoredClient().getRelease());
@@ -117,13 +117,13 @@ public class TokenTool extends Application {
 		stage = primaryStage;
 		setUserAgentStylesheet(STYLESHEET_MODENA); // Setting the style back to the new Modena
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(AppConstants.TOKEN_TOOL_FXML), ResourceBundle.getBundle(AppConstants.TOKEN_TOOL_BUNDLE));
-		
+
 		try {
 			root = fxmlLoader.load();
 		} catch (IOException e) {
 			log.error("Error loading " + AppConstants.TOKEN_TOOL_FXML, e);
 		}
-		
+
 		tokentool_Controller = (TokenTool_Controller) fxmlLoader.getController();
 
 		Scene scene = new Scene(root);

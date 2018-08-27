@@ -218,15 +218,15 @@ public final class ExtractImagesFromPDF {
 			}
 			event.consume();
 		});
-		
-		// Right click sets background vs portrait... 
+
+		// Right click sets background vs portrait...
 		// Drag will consume the event first so image doesn't reset...
 		imageButton.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
 			imageButton.setSelected(true);
 			tokenTool_Controller.updateImage(imageViewNode.getImage(), imageName, event.getButton().equals(MouseButton.SECONDARY));
 			event.consume();
 		});
-		
+
 		// capture other actions like touch, focus+spacebar, etc
 		imageButton.addEventHandler(ActionEvent.ACTION, event -> {
 			imageButton.setSelected(true);

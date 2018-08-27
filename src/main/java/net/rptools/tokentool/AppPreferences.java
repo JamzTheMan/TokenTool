@@ -43,6 +43,9 @@ public class AppPreferences {
 	private static final String FILE_NAME_TEXT_FIELD = "fileNameTextField";
 	private static final String FILE_NAME_SUFFIX_TEXT_FIELD = "fileNameSuffixTextField";
 	private static final String USE_FILE_NUMBERING = "useFileNumberingCheckbox";
+	private static final String SAVE_PORTRAIT_ON_DRAG = "savePortraitOnDragCheckbox";
+	private static final String USE_BACKGROUND_ON_DRAG = "useBackgroundOnDragCheckbox";
+
 	private static final String RECENT_OVERLAY_COUNT = "recent_overlay_count";
 	private static final String RECENT_OVERLAY = "recent_overlay_";
 	private static final String PORTRAIT_IMAGEVIEW_PREFERENCES = "portraitImageView_preferences";
@@ -56,12 +59,16 @@ public class AppPreferences {
 
 	public static final String LAST_PDF_FILE = "lastPdfFileSaved";
 	public static final String LAST_BACKGROUND_IMAGE_FILE = "lastBackgroundImageFile";
+	public static final String LAST_PORTRAIT_IMAGE_FILE = "lastPortraitImageFile";
 
 	private static final String PORTRAIT_TRANSPARENCY = "portraitTransparency";
 	private static final String PORTRAIT_BLUR = "portraitBlur";
 	private static final String PORTRAIT_GLOW = "portraitGlow";
 
 	private static final String OVERLAY_TRANSPARENCY = "overlayTransparency";
+	private static final String PORTRAIT_NAME_TEXT_FIELD = "portraitNameTextField";
+	private static final String USE_TOKEN_NAME = "useTokenNameCheckbox";
+	private static final String PORTRAIT_NAME_SUFFIX_TEXT_FIELD = "portraitNameSuffixTextField";
 
 	public static void setPreference(String preference, String value) {
 		prefs.put(preference, value);
@@ -100,8 +107,8 @@ public class AppPreferences {
 
 		// Save Overlay details
 		prefs.putBoolean(OVERLAY_ASPECT, tokentool_Controller.getOverlayAspect());
-		prefs.putDouble(OVERLAY_WIDTH, tokentool_Controller.getOverlayWidth());
-		prefs.putDouble(OVERLAY_HEIGHT, tokentool_Controller.getOverlayHeight());
+		prefs.putInt(OVERLAY_WIDTH, tokentool_Controller.getOverlayWidth());
+		prefs.putInt(OVERLAY_HEIGHT, tokentool_Controller.getOverlayHeight());
 		prefs.putBoolean(OVERLAY_USE_BASE, tokentool_Controller.getOverlayUseAsBase());
 		prefs.putBoolean(OVERLAY_CLIP_PORTRAIT, tokentool_Controller.getClipPortraitCheckbox());
 
@@ -109,6 +116,11 @@ public class AppPreferences {
 		prefs.putBoolean(USE_FILE_NUMBERING, tokentool_Controller.getUseFileNumberingCheckbox());
 		prefs.put(FILE_NAME_TEXT_FIELD, tokentool_Controller.getFileNameTextField());
 		prefs.put(FILE_NAME_SUFFIX_TEXT_FIELD, tokentool_Controller.getFileNameSuffixTextField());
+		prefs.put(PORTRAIT_NAME_TEXT_FIELD, tokentool_Controller.getPortraitNameTextField());
+		prefs.putBoolean(USE_TOKEN_NAME, tokentool_Controller.getUseTokenNameCheckbox());
+		prefs.put(PORTRAIT_NAME_SUFFIX_TEXT_FIELD, tokentool_Controller.getPortraitNameSuffixTextField());
+		prefs.putBoolean(SAVE_PORTRAIT_ON_DRAG, tokentool_Controller.getSavePortraitOnDragCheckbox());
+		prefs.putBoolean(USE_BACKGROUND_ON_DRAG, tokentool_Controller.getUseBackgroundOnDragCheckbox());
 
 		// Save recent overlays used
 		log.debug("...saving recent overlay count");
@@ -166,8 +178,8 @@ public class AppPreferences {
 
 		// Restore Overlay details
 		tokentool_Controller.setOverlayAspect(prefs.getBoolean(OVERLAY_ASPECT, AppConstants.DEFAULT_OVERLAY_ASPECT));
-		tokentool_Controller.setOverlayWidth(prefs.getDouble(OVERLAY_WIDTH, AppConstants.DEFAULT_OVERLAY_SIZE));
-		tokentool_Controller.setOverlayHeight(prefs.getDouble(OVERLAY_HEIGHT, AppConstants.DEFAULT_OVERLAY_SIZE));
+		tokentool_Controller.setOverlayWidth(prefs.getInt(OVERLAY_WIDTH, AppConstants.DEFAULT_OVERLAY_SIZE));
+		tokentool_Controller.setOverlayHeight(prefs.getInt(OVERLAY_HEIGHT, AppConstants.DEFAULT_OVERLAY_SIZE));
 		tokentool_Controller.setOverlayUseAsBase(prefs.getBoolean(OVERLAY_USE_BASE, AppConstants.DEFAULT_OVERLAY_USE_BASE));
 		tokentool_Controller.setClipPortraitCheckbox(prefs.getBoolean(OVERLAY_CLIP_PORTRAIT, AppConstants.DEFAULT_OVERLAY_CLIP_PORTRAIT));
 
@@ -175,6 +187,11 @@ public class AppPreferences {
 		tokentool_Controller.setUseFileNumberingCheckbox(prefs.getBoolean(USE_FILE_NUMBERING, AppConstants.DEFAULT_USE_FILE_NUMBERING));
 		tokentool_Controller.setFileNameTextField(prefs.get(FILE_NAME_TEXT_FIELD, AppConstants.DEFAULT_TOKEN_NAME));
 		tokentool_Controller.setFileNameSuffixTextField(prefs.get(FILE_NAME_SUFFIX_TEXT_FIELD, AppConstants.DEFAULT_FILE_NAME_SUFFIX));
+		tokentool_Controller.setUseTokenNameCheckbox(prefs.getBoolean(USE_TOKEN_NAME, AppConstants.DEFAULT_USE_TOKEN_NAME));
+		tokentool_Controller.setPortraitNameTextField(prefs.get(PORTRAIT_NAME_TEXT_FIELD, AppConstants.DEFAULT_PORTRAIT_NAME_TEXT_FIELD));
+		tokentool_Controller.setPortraitNameSuffixTextField(prefs.get(PORTRAIT_NAME_SUFFIX_TEXT_FIELD, AppConstants.DEFAULT_PORTRAIT_NAME_SUFFIX_TEXT_FIELD));
+		tokentool_Controller.setUseBackgroundOnDragCheckbox(prefs.getBoolean(USE_BACKGROUND_ON_DRAG, AppConstants.DEFAULT_USE_BACKGROUND_ON_DRAG));
+		tokentool_Controller.setSavePortraitOnDragCheckbox(prefs.getBoolean(SAVE_PORTRAIT_ON_DRAG, AppConstants.DEFAULT_SAVE_PORTRAIT_ON_DRAG));
 
 		// Restore Portrait Effects
 		tokentool_Controller.getPortraitTransparencySlider().setValue(prefs.getDouble(PORTRAIT_TRANSPARENCY, AppConstants.DEFAULT_PORTRAIT_TRANSPARENCY));
@@ -203,6 +220,7 @@ public class AppPreferences {
 		// Restore last portrait used
 		tokentool_Controller.setPortraitFrom_Preferences(prefs.get(PORTRAIT_IMAGEVIEW_PREFERENCES, null));
 		tokentool_Controller.setBackgroundFrom_Preferences(prefs.get(BACKGROUND_IMAGEVIEW_PREFERENCES, null));
+
 	}
 
 	public static void removeAllPreferences() {

@@ -8,7 +8,9 @@
  */
 package net.rptools.tokentool.controller;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -96,6 +97,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import net.rptools.tokentool.AppConstants;
 import net.rptools.tokentool.AppPreferences;
 import net.rptools.tokentool.client.Credits;
@@ -125,7 +127,6 @@ public class TokenTool_Controller {
 	@FXML private TitledPane overlayOptionsPane;
 	@FXML private TitledPane backgroundOptionsPane;
 	@FXML private TitledPane zoomOptionsPane;
-
 	@FXML private StackPane compositeTokenPane;
 	@FXML private BorderPane tokenPreviewPane;
 	@FXML private ScrollPane portraitScrollPane;
@@ -144,6 +145,8 @@ public class TokenTool_Controller {
 
 	@FXML private CheckBox useFileNumberingCheckbox;
 	@FXML private CheckBox useTokenNameCheckbox;
+	@FXML private CheckBox savePortraitOnDragCheckbox;
+	@FXML private CheckBox useBackgroundOnDragCheckbox;
 	@FXML private CheckBox overlayUseAsBaseCheckbox;
 	@FXML private CheckBox clipPortraitCheckbox;
 
@@ -164,8 +167,8 @@ public class TokenTool_Controller {
 
 	@FXML private Slider overlayTransparencySlider;
 
-	@FXML private Spinner<Double> overlayWidthSpinner;
-	@FXML private Spinner<Double> overlayHeightSpinner;
+	@FXML private Spinner<Integer> overlayWidthSpinner;
+	@FXML private Spinner<Integer> overlayHeightSpinner;
 
 	@FXML private ProgressBar overlayTreeProgressBar;
 	@FXML private Label progressBarLabel;
@@ -202,8 +205,8 @@ public class TokenTool_Controller {
 	private FileSaveUtil fileSaveUtil = new FileSaveUtil();
 
 	// A custom set of Width/Height sizes to use for Overlays
-	private NavigableSet<Double> overlaySpinnerSteps = new TreeSet<Double>(Arrays.asList(50d, 100d, 128d, 150d, 200d,
-			256d, 300d, 400d, 500d, 512d, 600d, 700d, 750d, 800d, 900d, 1000d));
+	private NavigableSet<Integer> overlaySpinnerSteps = new TreeSet<Integer>(Arrays.asList(50, 100, 128, 150, 200,
+			256, 300, 400, 500, 512, 600, 700, 750, 800, 900, 1000));
 
 	@FXML
 	void initialize() {
@@ -240,13 +243,19 @@ public class TokenTool_Controller {
 		assert tokenImageView != null : "fx:id=\"tokenImageView\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert useFileNumberingCheckbox != null : "fx:id=\"useFileNumberingCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
-		assert useTokenNameCheckbox != null : "fx:id=\"useFileNumberingCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert useTokenNameCheckbox != null : "fx:id=\"useTokenNameCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert savePortraitOnDragCheckbox != null : "fx:id=\"savePortraitOnDragCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert useBackgroundOnDragCheckbox != null : "fx:id=\"useBackgroundOnDragCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert overlayUseAsBaseCheckbox != null : "fx:id=\"overlayUseAsBaseCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert clipPortraitCheckbox != null : "fx:id=\"clipPortraitCheckbox\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert fileNameTextField != null : "fx:id=\"fileNameTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileNameSuffixLabel != null : "fx:id=\"fileNameSuffixLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert fileNameSuffixTextField != null : "fx:id=\"fileNameSuffixTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert portraitNameTextField != null : "fx:id=\"portraitNameTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert portraitNameSuffixLabel != null : "fx:id=\"portraitNameSuffixLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert portraitNameSuffixTextField != null : "fx:id=\"portraitNameSuffixTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
+
 		assert overlayNameLabel != null : "fx:id=\"overlayNameLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert backgroundColorPicker != null : "fx:id=\"backgroundColorPicker\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert overlayAspectToggleButton != null : "fx:id=\"overlayAspectToggleButton\" was not injected: check your FXML file 'TokenTool.fxml'.";
@@ -275,6 +284,11 @@ public class TokenTool_Controller {
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_Y = portraitImageView.getTranslateY();
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_SCALE = portraitImageView.getScaleY();
 		AppConstants.DEFAULT_PORTRAIT_IMAGE_ROTATE = portraitImageView.getRotate();
+		AppConstants.DEFAULT_SAVE_PORTRAIT_ON_DRAG = getSavePortraitOnDragCheckbox();
+		AppConstants.DEFAULT_USE_BACKGROUND_ON_DRAG = getUseBackgroundOnDragCheckbox();
+		AppConstants.DEFAULT_PORTRAIT_NAME_TEXT_FIELD = getPortraitNameTextField();
+		AppConstants.DEFAULT_USE_TOKEN_NAME = getUseTokenNameCheckbox();
+		AppConstants.DEFAULT_PORTRAIT_NAME_SUFFIX_TEXT_FIELD = getPortraitNameSuffixTextField();
 
 		executorService = Executors.newCachedThreadPool(runable -> {
 			loadOverlaysThread = Executors.defaultThreadFactory().newThread(runable);
@@ -323,12 +337,15 @@ public class TokenTool_Controller {
 		fileNameTextField.setTextFormatter(new TextFormatter<>(filter));
 		portraitNameTextField.setTextFormatter(new TextFormatter<>(filter));
 		portraitNameTextField.textProperty().bind(fileNameTextField.textProperty().concat(portraitNameSuffixTextField.textProperty()));
-		
+
 		// Bind portrait name to token name if useTokenNameCheckbox is checked
 		portraitNameTextField.disableProperty().bind(useTokenNameCheckbox.selectedProperty());
 		portraitNameSuffixLabel.disableProperty().bind(useTokenNameCheckbox.selectedProperty().not());
 		portraitNameSuffixTextField.disableProperty().bind(useTokenNameCheckbox.selectedProperty().not());
-		
+
+		// Bind the use background on drag to save portrait on drag checkbox
+		useBackgroundOnDragCheckbox.disableProperty().bind(savePortraitOnDragCheckbox.selectedProperty().not());
+
 		useTokenNameCheckbox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
 			if (isNowSelected) {
 				portraitNameTextField.textProperty().bind(fileNameTextField.textProperty().concat(portraitNameSuffixTextField.textProperty()));
@@ -372,12 +389,47 @@ public class TokenTool_Controller {
 		});
 
 		// Bind width/height spinners to overlay width/height
-		overlayWidthSpinner.getValueFactory().valueProperty()
-				.bindBidirectional(overlayHeightSpinner.getValueFactory().valueProperty());
-		overlayWidthSpinner.valueProperty()
-				.addListener((observable, oldValue, newValue) -> overlayWidthSpinner_onTextChanged(oldValue, newValue));
-		overlayHeightSpinner.valueProperty().addListener(
-				(observable, oldValue, newValue) -> overlayHeightSpinner_onTextChanged(oldValue, newValue));
+		overlayWidthSpinner.getValueFactory().valueProperty().bindBidirectional(overlayHeightSpinner.getValueFactory().valueProperty());
+		overlayWidthSpinner.valueProperty().addListener((observable, oldValue, newValue) -> overlayWidthSpinner_onTextChanged(oldValue, newValue));
+		overlayWidthSpinner.getValueFactory().setConverter(new StringConverter<Integer>() {
+			@Override
+			public String toString(Integer object) {
+				return object.toString();
+			}
+
+			@Override
+			public Integer fromString(String string) {
+				int value = 256;
+
+				try {
+					value = Integer.parseInt(string);
+				} catch (NumberFormatException e) {
+					log.info("NOPE");
+				}
+
+				return value;
+			}
+		});
+		overlayHeightSpinner.valueProperty().addListener((observable, oldValue, newValue) -> overlayHeightSpinner_onTextChanged(oldValue, newValue));
+		overlayHeightSpinner.getValueFactory().setConverter(new StringConverter<Integer>() {
+			@Override
+			public String toString(Integer object) {
+				return object.toString();
+			}
+
+			@Override
+			public Integer fromString(String string) {
+				int value = 256;
+
+				try {
+					value = Integer.parseInt(string);
+				} catch (NumberFormatException e) {
+					log.info("NOPE");
+				}
+
+				return value;
+			}
+		});
 
 		// Bind the background/portrait pane widths to keep things centered.
 		// Otherwise StackPane sets width/height to largest value from the ImageView nodes within it
@@ -416,6 +468,49 @@ public class TokenTool_Controller {
 		}
 
 		updateTokenPreviewImageView();
+		backgroundMenuItem.fire(); // Set current layer to background
+	}
+
+	@FXML
+	void removeBackgroundImageButton_OnAction(ActionEvent event) {
+		backgroundImageView.setImage(null);
+		updateTokenPreviewImageView();
+		portraitMenuItem.fire(); // Set current layer to portrait
+	}
+
+	@FXML
+	void changePortraitImageButton_OnAction(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(I18N.getString("TokenTool.openPortraitImage.filechooser.title"));
+		fileChooser.getExtensionFilters().addAll(AppConstants.IMAGE_EXTENSION_FILTER);
+
+		File lastPortraitImageFile = new File(AppPreferences.getPreference(AppPreferences.LAST_PORTRAIT_IMAGE_FILE, ""));
+
+		if (lastPortraitImageFile.exists())
+			fileChooser.setInitialDirectory(lastPortraitImageFile);
+		else if (lastPortraitImageFile.getParentFile() != null)
+			fileChooser.setInitialDirectory(lastPortraitImageFile.getParentFile());
+
+		File selectedImageFile = fileChooser.showOpenDialog((Stage) compositeGroup.getScene().getWindow());
+
+		if (selectedImageFile != null) {
+			try {
+				updatePortrait(new Image(selectedImageFile.toURI().toString()));
+				AppPreferences.setPreference(AppPreferences.LAST_PORTRAIT_IMAGE_FILE, selectedImageFile.getParentFile().getCanonicalPath());
+			} catch (IOException e) {
+				log.error("Error loading Image " + selectedImageFile.getAbsolutePath());
+			}
+		}
+
+		updateTokenPreviewImageView();
+		portraitMenuItem.fire(); // Set current layer to portrait
+	}
+
+	@FXML
+	void removePortraitImageButton_OnAction(ActionEvent event) {
+		portraitImageView.setImage(null);
+		updateTokenPreviewImageView();
+		portraitMenuItem.fire(); // Set current layer to portrait
 	}
 
 	@FXML
@@ -812,22 +907,40 @@ public class TokenTool_Controller {
 
 	@FXML
 	void tokenImageView_OnDragDetected(MouseEvent event) {
-		Dragboard db = tokenImageView.startDragAndDrop(TransferMode.ANY);
+		Dragboard db = tokenImageView.startDragAndDrop(TransferMode.COPY);
 		ClipboardContent content = new ClipboardContent();
 
 		boolean saveAsToken = false;
 
 		try {
-			File tempTokenFile = fileSaveUtil.getTempFileName(saveAsToken, useFileNumberingCheckbox.isSelected(),
-					fileNameTextField.getText(), fileNameSuffixTextField);
+			File tempTokenFile;
+			File tempPortraitFile = null;
+			ArrayList<File> tempFiles = new ArrayList<File>();
 
+			// Here we don't advance the fileNameSuffix so portrait name has same number, we'll advance it after the second call
+			tempTokenFile = fileSaveUtil.getTempFileName(saveAsToken, useFileNumberingCheckbox.isSelected(), getFileNameTextField(), fileNameSuffixTextField, false);
 			writeTokenImage(tempTokenFile);
-			content.putFiles(java.util.Collections.singletonList(tempTokenFile));
+			tempFiles.add(tempTokenFile);
+
+			tempPortraitFile = fileSaveUtil.getTempFileName(saveAsToken, useFileNumberingCheckbox.isSelected(), getPortraitNameTextField(), fileNameSuffixTextField, true);
+			if (savePortraitOnDragCheckbox.isSelected()) {
+				tempPortraitFile = writePortraitImage(tempPortraitFile);
+				if (tempPortraitFile != null)
+					tempFiles.add(tempPortraitFile);
+			}
+
+			content.putFiles(tempFiles);
+
 			tempTokenFile.deleteOnExit();
+			tempPortraitFile.deleteOnExit();
 		} catch (Exception e) {
 			log.error(e);
 		} finally {
-			content.putImage(tokenImageView.getImage());
+			if (event.isPrimaryButtonDown())
+				content.putImage(tokenImageView.getImage());
+			else
+				content.putImage(getPortraitImage());
+
 			db.setContent(content);
 			event.consume();
 		}
@@ -889,7 +1002,7 @@ public class TokenTool_Controller {
 
 	}
 
-	void overlayWidthSpinner_onTextChanged(double oldValue, double newValue) {
+	void overlayWidthSpinner_onTextChanged(int oldValue, int newValue) {
 		if (newValue < overlaySpinnerSteps.first())
 			newValue = overlaySpinnerSteps.first();
 
@@ -907,7 +1020,7 @@ public class TokenTool_Controller {
 		updateTokenPreviewImageView();
 	}
 
-	void overlayHeightSpinner_onTextChanged(double oldValue, double newValue) {
+	void overlayHeightSpinner_onTextChanged(int oldValue, int newValue) {
 		if (newValue < overlaySpinnerSteps.first())
 			newValue = overlaySpinnerSteps.first();
 
@@ -963,7 +1076,7 @@ public class TokenTool_Controller {
 		FileChooser fileChooser = new FileChooser();
 
 		try {
-			File tokenFile = fileSaveUtil.getFileName(false, useFileNumberingCheckbox.isSelected(), fileNameTextField.getText(), fileNameSuffixTextField);
+			File tokenFile = fileSaveUtil.getFileName(false, useFileNumberingCheckbox.isSelected(), fileNameTextField.getText(), fileNameSuffixTextField, true);
 			fileChooser.setInitialFileName(tokenFile.getName());
 			if (tokenFile.getParentFile() != null)
 				if (tokenFile.getParentFile().isDirectory())
@@ -1004,6 +1117,44 @@ public class TokenTool_Controller {
 		}
 
 		return false;
+	}
+
+	private File writePortraitImage(File tokenFile) {
+		try {
+			String imageType = "png";
+			Image tokenImage;
+			tokenImage = getPortraitImage();
+			BufferedImage imageRGB = SwingFXUtils.fromFXImage(tokenImage, null);
+
+			if (useBackgroundOnDragCheckbox.isSelected()) {
+				if (getBackgroundColor() != Color.TRANSPARENT || getBackgroundImage() != null) {
+					tokenImage = ImageUtil.autoCropImage(tokenImage, getBackgroundColor(), getBackgroundImage());
+					imageType = "jpg";
+
+					String newFileName = FilenameUtils.removeExtension(tokenFile.getAbsolutePath()) + "." + imageType;
+					tokenFile = new File(newFileName);
+
+					// Remove alpha-channel from buffered image
+					BufferedImage image = SwingFXUtils.fromFXImage(tokenImage, null);
+					imageRGB = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.OPAQUE);
+					Graphics2D graphics = imageRGB.createGraphics();
+					graphics.drawImage(image, 0, 0, null);
+					graphics.dispose();
+
+					ImageIO.write(imageRGB, imageType, tokenFile);
+				}
+			}
+
+			if (ImageIO.write(imageRGB, imageType, tokenFile))
+				return tokenFile;
+
+		} catch (IOException e) {
+			log.error("Unable to write token to file: " + tokenFile.getAbsolutePath(), e);
+		} catch (IndexOutOfBoundsException e) {
+			log.error("Image width/height out of bounds: " + getOverlayWidth() + " x " + getOverlayHeight(), e);
+		}
+
+		return null;
 	}
 
 	public void updateOverlayTreeViewRecentFolder(boolean selectMostRecent) {
@@ -1311,19 +1462,19 @@ public class TokenTool_Controller {
 	/*
 	 * getter/setter methods, mainly for user preferences
 	 */
-	public double getOverlayWidth() {
+	public int getOverlayWidth() {
 		return overlayWidthSpinner.getValue();
 	}
 
-	public void setOverlayWidth(double newValue) {
+	public void setOverlayWidth(int newValue) {
 		overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
 	}
 
-	public double getOverlayHeight() {
+	public int getOverlayHeight() {
 		return overlayHeightSpinner.getValue();
 	}
 
-	public void setOverlayHeight(double newValue) {
+	public void setOverlayHeight(int newValue) {
 		overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
 	}
 
@@ -1358,6 +1509,32 @@ public class TokenTool_Controller {
 		return fileNameTextField.getText();
 	}
 
+	public String getPortraitNameTextField() {
+		return portraitNameTextField.getText();
+	}
+
+	public void setPortraitNameTextField(String text) {
+		if (!portraitNameTextField.isDisabled())
+			portraitNameTextField.setText(text);
+	}
+
+	public boolean getUseTokenNameCheckbox() {
+		return useTokenNameCheckbox.isSelected();
+	}
+
+	public void setUseTokenNameCheckbox(boolean selected) {
+		if (selected != useTokenNameCheckbox.isSelected())
+			useTokenNameCheckbox.fire();
+	}
+
+	public String getPortraitNameSuffixTextField() {
+		return portraitNameSuffixTextField.getText();
+	}
+
+	public void setPortraitNameSuffixTextField(String text) {
+		portraitNameSuffixTextField.setText(text);
+	}
+
 	public void setFileNameTextField(String text) {
 		fileNameTextField.setText(text);
 	}
@@ -1387,6 +1564,24 @@ public class TokenTool_Controller {
 		fileNameSuffixTextField.setText(text);
 	}
 
+	public boolean getSavePortraitOnDragCheckbox() {
+		return savePortraitOnDragCheckbox.isSelected();
+	}
+
+	public void setSavePortraitOnDragCheckbox(boolean selected) {
+		if (selected != savePortraitOnDragCheckbox.isSelected())
+			savePortraitOnDragCheckbox.fire();
+	}
+
+	public boolean getUseBackgroundOnDragCheckbox() {
+		return useBackgroundOnDragCheckbox.isSelected();
+	}
+
+	public void setUseBackgroundOnDragCheckbox(boolean selected) {
+		if (selected != useBackgroundOnDragCheckbox.isSelected())
+			useBackgroundOnDragCheckbox.fire();
+	}
+
 	// For user preferences...
 	public void setWindoFrom_Preferences(String preferencesJson) {
 		if (preferencesJson != null) {
@@ -1408,8 +1603,7 @@ public class TokenTool_Controller {
 			ImageView_Preferences imageView_Preferences = new Gson().fromJson(preferencesJson, new TypeToken<ImageView_Preferences>() {}.getType());
 			portraitImageView = imageView_Preferences.toImageView(portraitImageView);
 		} else {
-			log.info("here!");
-			// portraitImageView.setImage(AppConstants.DEFAULT_PORTRAIT_IMAGE);
+			log.debug("No Preferences currently saved.");
 		}
 	}
 

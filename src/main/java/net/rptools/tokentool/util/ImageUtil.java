@@ -70,12 +70,12 @@ public class ImageUtil {
 	private static ImageView getImage(ImageView thumbView, final Path filePath, final boolean overlayWanted, final int THUMB_SIZE) throws IOException {
 		Image thumb = null;
 		String fileURL = filePath.toUri().toURL().toString();
-		
+
 		if (THUMB_SIZE > 0) {
 			thumbView.setFitWidth(THUMB_SIZE);
 			thumbView.setPreserveRatio(true);
 		}
-		
+
 		if (ImageUtil.SUPPORTED_IMAGE_FILE_FILTER.accept(null, fileURL)) {
 			thumb = processMagenta(new Image(fileURL), COLOR_THRESHOLD, overlayWanted);
 		} else if (ImageUtil.PSD_FILE_FILTER.accept(null, fileURL)) {
@@ -211,6 +211,10 @@ public class ImageUtil {
 	 * Crop image to smallest width/height based on transparency
 	 */
 	private static Image autoCropImage(Image imageSource) {
+		return autoCropImage(imageSource, Color.TRANSPARENT, null);
+	}
+
+	public static Image autoCropImage(Image imageSource, Color backgroundColor, Image backgroundImage) {
 		ImageView croppedImageView = new ImageView(imageSource);
 		PixelReader pixelReader = imageSource.getPixelReader();
 
@@ -244,9 +248,13 @@ public class ImageUtil {
 		Rectangle2D viewPort = new Rectangle2D(minX, minY, maxX - minX, maxY - minY);
 		SnapshotParameters parameter = new SnapshotParameters();
 		parameter.setViewport(viewPort);
-		parameter.setFill(Color.TRANSPARENT);
+		parameter.setFill(backgroundColor);
 
-		return croppedImageView.snapshot(parameter, null);
+		if (backgroundImage != null) {
+			return new Group(new ImageView(backgroundImage), croppedImageView).snapshot(parameter, null);
+		} else {
+			return croppedImageView.snapshot(parameter, null);
+		}
 	}
 
 	public static Image composePreview(StackPane compositeTokenPane, ImageView backgroundImageView, Color bgColor, ImageView portraitImageView, ImageView maskImageView, ImageView overlayImageView,

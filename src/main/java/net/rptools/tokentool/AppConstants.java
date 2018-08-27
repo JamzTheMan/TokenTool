@@ -49,9 +49,9 @@ public class AppConstants {
 	public static final boolean DEFAULT_OVERLAY_USE_BASE = false;
 	public static final boolean DEFAULT_OVERLAY_CLIP_PORTRAIT = true;
 	public static final boolean DEFAULT_USE_FILE_NUMBERING = false;
-	public static final double DEFAULT_OVERLAY_SIZE = 256;
+	public static final int DEFAULT_OVERLAY_SIZE = 256;
 
-	// From FXML, set by controller
+	// Set by controller using defaults set in FXML
 	public static Image DEFAULT_PORTRAIT_IMAGE;
 	public static ImageView DEFAULT_BACKGROUND_IMAGE_VIEW;
 	public static Image DEFAULT_MASK_IMAGE;
@@ -73,6 +73,12 @@ public class AppConstants {
 	public static final double DEFAULT_PORTRAIT_GLOW = 0;
 
 	public static final double DEFAULT_OVERLAY_TRANSPARENCY = 1;
+
+	public static boolean DEFAULT_SAVE_PORTRAIT_ON_DRAG;
+	public static boolean DEFAULT_USE_BACKGROUND_ON_DRAG;
+	public static String DEFAULT_PORTRAIT_NAME_TEXT_FIELD;
+	public static boolean DEFAULT_USE_TOKEN_NAME;
+	public static String DEFAULT_PORTRAIT_NAME_SUFFIX_TEXT_FIELD;
 
 	// public static final String DEFAULT_TOKEN_EXTENSION = ".rptok";
 	// public static final String DEFAULT_TOKEN_EXTENSION_DESCRIPTION = "MapTool Token";
