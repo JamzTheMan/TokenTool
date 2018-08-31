@@ -426,10 +426,8 @@ public class ManageOverlays_Controller {
 	@FXML
 	void overlayViewFlowPane_DragOver(DragEvent event) {
 		if (event.getDragboard().hasImage() || event.getDragboard().hasFiles() || event.getDragboard().hasUrl()) {
-			// TODO: Set Pane color to an alpha green
 			event.acceptTransferModes(TransferMode.COPY);
 		} else {
-			// TODO: Set Pane color to an alpha red?
 			event.acceptTransferModes(TransferMode.ANY);
 		}
 	}

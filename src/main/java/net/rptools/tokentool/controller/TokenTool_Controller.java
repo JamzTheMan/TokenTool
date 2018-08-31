@@ -992,7 +992,7 @@ public class TokenTool_Controller {
 	@FXML
 	void backgroundMenuItem_OnAction(ActionEvent event) {
 		String menuText = ((RadioMenuItem) event.getSource()).getText();
-		layerMenuButton.setText(menuText + " Layer"); // TODO: i18n this shit
+		layerMenuButton.setText(menuText + I18N.getString("controls.layers.menu.layer.text"));
 		backgroundMenuItem.setSelected(true);
 	}
 
