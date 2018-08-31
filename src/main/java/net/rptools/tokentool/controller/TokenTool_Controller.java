@@ -158,6 +158,7 @@ public class TokenTool_Controller {
 	@FXML private TextField portraitNameSuffixTextField;
 
 	@FXML private Label overlayNameLabel;
+	@FXML private Label overlayInfoLabel;
 	@FXML private ColorPicker backgroundColorPicker;
 	@FXML private ToggleButton overlayAspectToggleButton;
 
@@ -257,6 +258,7 @@ public class TokenTool_Controller {
 		assert portraitNameSuffixTextField != null : "fx:id=\"portraitNameSuffixTextField\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
 		assert overlayNameLabel != null : "fx:id=\"overlayNameLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
+		assert overlayInfoLabel != null : "fx:id=\"overlayInfoLabel\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert backgroundColorPicker != null : "fx:id=\"backgroundColorPicker\" was not injected: check your FXML file 'TokenTool.fxml'.";
 		assert overlayAspectToggleButton != null : "fx:id=\"overlayAspectToggleButton\" was not injected: check your FXML file 'TokenTool.fxml'.";
 
@@ -404,7 +406,7 @@ public class TokenTool_Controller {
 				try {
 					value = Integer.parseInt(string);
 				} catch (NumberFormatException e) {
-					log.info("NOPE");
+					log.debug("Invalid overlay size entered.", e);
 				}
 
 				return value;
@@ -1009,10 +1011,12 @@ public class TokenTool_Controller {
 		if (newValue > overlaySpinnerSteps.last())
 			newValue = overlaySpinnerSteps.last();
 
-		if (newValue > oldValue)
-			overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
-		else
-			overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.floor(newValue));
+		if (getOverlayAspect()) {
+			if (newValue > oldValue)
+				overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
+			else
+				overlayWidthSpinner.getValueFactory().setValue(overlaySpinnerSteps.floor(newValue));
+		}
 
 		overlayImageView.setFitWidth(overlayWidthSpinner.getValue());
 		maskImageView.setFitWidth(overlayWidthSpinner.getValue());
@@ -1027,10 +1031,12 @@ public class TokenTool_Controller {
 		if (newValue > overlaySpinnerSteps.last())
 			newValue = overlaySpinnerSteps.last();
 
-		if (newValue > oldValue)
-			overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
-		else
-			overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.floor(newValue));
+		if (getOverlayAspect()) {
+			if (newValue > oldValue)
+				overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.ceiling(newValue));
+			else
+				overlayHeightSpinner.getValueFactory().setValue(overlaySpinnerSteps.floor(newValue));
+		}
 
 		overlayImageView.setFitHeight(overlayHeightSpinner.getValue());
 		maskImageView.setFitHeight(overlayHeightSpinner.getValue());
@@ -1291,6 +1297,7 @@ public class TokenTool_Controller {
 
 			// Set the text label
 			overlayNameLabel.setText(FilenameUtils.getBaseName(filePath.toFile().getName()));
+			overlayInfoLabel.setText((int) overlayImageView.getImage().getWidth() + " x " + (int) overlayImageView.getImage().getHeight());
 
 			updateTokenPreviewImageView();
 		} catch (IOException e) {
@@ -1312,6 +1319,7 @@ public class TokenTool_Controller {
 		overlayTreeProgressBar.setVisible(true);
 		overlayTreeProgressBar.setOpacity(1.0);
 		overlayNameLabel.setOpacity(0.0);
+		overlayInfoLabel.setOpacity(0.0);
 		progressBarLabel.setVisible(true);
 		updateOverlayTreeview(null);
 
@@ -1335,26 +1343,32 @@ public class TokenTool_Controller {
 		addPseudoClassToLeafs(overlayTreeView);
 		updateOverlayTreeViewRecentFolder(false);
 
-		// overlayNameLabel.setVisible(true);
 		overlayTreeProgressBar.setStyle("-fx-accent: forestgreen;");
 		progressBarLabel.setVisible(false);
 
-		FadeTransition fadeOut = new FadeTransition(Duration.millis(2000));
-		fadeOut.setNode(overlayTreeProgressBar);
-		fadeOut.setFromValue(1.0);
-		fadeOut.setToValue(0.0);
-		fadeOut.setCycleCount(1);
-		fadeOut.setAutoReverse(false);
-		fadeOut.playFromStart();
+		FadeTransition progressBarFadeOut = new FadeTransition(Duration.millis(2000));
+		progressBarFadeOut.setNode(overlayTreeProgressBar);
+		progressBarFadeOut.setFromValue(1.0);
+		progressBarFadeOut.setToValue(0.0);
+		progressBarFadeOut.setCycleCount(1);
+		progressBarFadeOut.setAutoReverse(false);
+		progressBarFadeOut.playFromStart();
 
-		FadeTransition fadeIn = new FadeTransition(Duration.millis(4000));
-		fadeIn.setNode(overlayNameLabel);
-		fadeIn.setFromValue(0.0);
-		fadeIn.setToValue(1.0);
-		fadeIn.setCycleCount(1);
-		fadeIn.setAutoReverse(false);
-		fadeIn.playFromStart();
+		FadeTransition nameFadeIn = new FadeTransition(Duration.millis(4000));
+		nameFadeIn.setNode(overlayNameLabel);
+		nameFadeIn.setFromValue(0.0);
+		nameFadeIn.setToValue(1.0);
+		nameFadeIn.setCycleCount(1);
+		nameFadeIn.setAutoReverse(false);
+		nameFadeIn.playFromStart();
 
+		FadeTransition infoFadeIn = new FadeTransition(Duration.millis(4000));
+		infoFadeIn.setNode(overlayInfoLabel);
+		infoFadeIn.setFromValue(0.0);
+		infoFadeIn.setToValue(1.0);
+		infoFadeIn.setCycleCount(1);
+		infoFadeIn.setAutoReverse(false);
+		infoFadeIn.playFromStart();
 	}
 
 	private TreeItem<Path> cacheOverlays(File dir, TreeItem<Path> parent, int THUMB_SIZE) throws IOException {

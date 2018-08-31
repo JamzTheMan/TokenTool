@@ -362,14 +362,20 @@
 																			<children>
 																				<StackPane>
 																					<children>
-																						<Label fx:id="overlayNameLabel" alignment="BOTTOM_LEFT" graphicTextGap="0.0" text="Gear, Chrome" textFill="#900b0b" StackPane.alignment="CENTER_LEFT">
-																							<font>
-																								<Font name="System Bold Italic" size="11.0" />
-																							</font>
-																							<StackPane.margin>
-																								<Insets />
-																							</StackPane.margin>
-																						</Label>
+                                                                  <VBox>
+                                                                     <children>
+      																						<Label fx:id="overlayNameLabel" alignment="BOTTOM_LEFT" graphicTextGap="0.0" text="Gear, Chrome" textFill="#900b0b">
+      																							<font>
+      																								<Font name="System Bold Italic" size="11.0" />
+      																							</font>
+      																						</Label>
+                                                                        <Label fx:id="overlayInfoLabel" graphicTextGap="0.0" text="256 x 256">
+                                                                           <font>
+                                                                              <Font name="System Bold Italic" size="10.0" />
+                                                                           </font>
+                                                                        </Label>
+                                                                     </children>
+                                                                  </VBox>
 																						<ProgressBar fx:id="overlayTreeProgressBar" opacity="0.0" prefWidth="189.0" progress="0.0" />
 																						<Label fx:id="progressBarLabel" contentDisplay="CENTER" graphicTextGap="0.0">
 																							<opaqueInsets>

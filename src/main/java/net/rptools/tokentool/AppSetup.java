@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -27,10 +26,8 @@ import org.reflections.scanners.ResourcesScanner;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import net.rptools.tokentool.client.TokenTool;
-import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.I18N;
 import net.rptools.tokentool.util.ImageUtil;
 
@@ -40,7 +37,7 @@ import net.rptools.tokentool.util.ImageUtil;
 public class AppSetup {
 	private static Logger log; // Don't instantiate until install gets and sets user_home/logs directory
 
-	private static final String DEFAULT_OVERLAYS = "net/rptools/tokentool/overlays/v2";
+	private static final String DEFAULT_OVERLAYS = "net/rptools/tokentool/overlays/";
 	private static final String USER_HOME;
 
 	static {
@@ -98,17 +95,6 @@ public class AppSetup {
 			return;
 
 		Platform.runLater(() -> {
-			// log.info("Is stage up yet?" + TokenTool.getInstance().getStage().isShowing());
-			// while( (TokenTool.getInstance().getStage() == null)) {
-			// log.info("is TokenTool.getInstance() null? " + (TokenTool.getInstance().getStage() == null));
-			// try {
-			// Thread.sleep(500);
-			// } catch (InterruptedException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-			// }
-
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle(I18N.getString("AppSetup.dialog.install.overlays.confirmation.title"));
 			alert.setContentText(overlaysInstalled + " " + I18N.getString("AppSetup.dialog.install.overlays.confirmation"));
@@ -120,27 +106,7 @@ public class AppSetup {
 	}
 
 	public static void installDefaultOverlays() throws IOException {
-		// Create the overlay directory
-		File overlayDir = AppConstants.OVERLAY_DIR;
-		overlayDir.mkdirs();
-
-		// Copy default overlays from resources
-		// https://dzone.com/articles/get-all-classes-within-package
-		Reflections reflections = new Reflections(DEFAULT_OVERLAYS, new ResourcesScanner());
-		Set<String> resourcePathSet = reflections.getResources(Pattern.compile(".*"));
-
-		for (String resourcePath : resourcePathSet) {
-			URL inputUrl = AppSetup.class.getClassLoader().getResource(resourcePath);
-			String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
-
-			try {
-				log.info("Installing overlay: " + resourceName);
-				FileUtils.copyURLToFile(inputUrl, new File(overlayDir, resourceName));
-			} catch (IOException e) {
-				log.error("ERROR writing " + inputUrl);
-				log.error(e);
-			}
-		}
+		installNewOverlays("0.0"); // Install all overlays
 	}
 
 	/*
@@ -155,12 +121,12 @@ public class AppSetup {
 
 		// Copy default overlays from resources
 		// https://dzone.com/articles/get-all-classes-within-package
-		Reflections reflections = new Reflections("net/rptools/tokentool/overlays/", new ResourcesScanner());
+		Reflections reflections = new Reflections(DEFAULT_OVERLAYS, new ResourcesScanner());
 		Set<String> resourcePathSet = reflections.getResources(Pattern.compile(".*"));
 
 		for (String resourcePath : resourcePathSet) {
 			URL inputUrl = AppSetup.class.getClassLoader().getResource(resourcePath);
-			String resourceName = resourcePath.substring("net/rptools/tokentool/overlays/".length());
+			String resourceName = resourcePath.substring(DEFAULT_OVERLAYS.length());
 
 			int verIndex = resourceName.indexOf("/");
 			String resourceVerion = resourceName.substring(1, verIndex).replace("_", ".");
