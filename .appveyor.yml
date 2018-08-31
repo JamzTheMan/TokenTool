@@ -32,7 +32,7 @@ artifacts:
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
-  auth_token: $GITHUB_RELEASE_KEY
+  auth_token: $(GITHUB_RELEASE_KEY)
   artifact: TokenTool-Jar, TokenTool-Windows, TokenTool-Linux
   draft: false
   prerelease: true
