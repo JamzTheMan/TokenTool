@@ -11,6 +11,7 @@ package net.rptools.tokentool.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -32,6 +34,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -54,6 +57,7 @@ public class PdfViewer_Controller implements Initializable {
 	@FXML private ScrollPane imageScrollPane;
 	@FXML private TilePane imageTilePane;
 	@FXML private ProgressIndicator pdfProgressIndicator;
+	@FXML private ProgressIndicator extractProgressIndicator;
 	@FXML private Pane viewPortPane;
 	@FXML private ScrollPane imageTileScrollpane;
 
@@ -61,7 +65,9 @@ public class PdfViewer_Controller implements Initializable {
 	private ImageView pdfImageView = new ImageView();
 
 	private static ExecutorService renderPdfPageService;
+	private static ExecutorService extractImagesService;
 	private AtomicInteger workerThreads = new AtomicInteger(0);
+	private AtomicInteger extractThreads = new AtomicInteger(0);
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
@@ -71,13 +77,16 @@ public class PdfViewer_Controller implements Initializable {
 		assert imageScrollPane != null : "fx:id=\"imageScrollPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert imageTilePane != null : "fx:id=\"imageFlowPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert pdfProgressIndicator != null : "fx:id=\"pdfProgressIndicator\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
+		assert extractProgressIndicator != null : "fx:id=\"extractProgressIndicator\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert viewPortPane != null : "fx:id=\"viewPortPane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 		assert imageTileScrollpane != null : "fx:id=\"imageTileScrollpane\" was not injected: check your FXML file '" + AppConstants.PDF_VIEW_FXML + "'.";
 
 		pdfProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+		extractProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 		pdfViewPagination.requestFocus();
 
 		renderPdfPageService = Executors.newWorkStealingPool();
+		extractImagesService = Executors.newSingleThreadExecutor();
 	}
 
 	public void loadPDF(File pdfFile, TokenTool_Controller tokenTool_Controller, Stage stage) {
@@ -100,6 +109,7 @@ public class PdfViewer_Controller implements Initializable {
 		pdfViewPagination.setPageFactory(new Callback<Integer, Node>() {
 			public Node call(final Integer pageIndex) {
 				workerThreads.incrementAndGet();
+				imageTilePane.getChildren().clear();
 
 				// First, blank the page out
 				pdfImageView.setImage(null);
@@ -164,8 +174,76 @@ public class PdfViewer_Controller implements Initializable {
 			// Since we are rendering in multiple threads, lets make sure the current page is shown when we are all done!
 			if (workerThreads.decrementAndGet() == 0) {
 				pdfImageView.setImage(pdfModel.getImage(pdfViewPagination.getCurrentPageIndex()));
-				// Platform.runLater(() -> extractImages()); // safe to do this now? still lags it up... wait till we multi-thread this i guess...
+
+				extractThreads.incrementAndGet();
+				pdfModel.interrupt();
+				extractImagesService.execute(new ExtractPdfImages(pageIndex));
 			}
+		}
+	}
+
+	private class ExtractPdfImages extends Task<Void> {
+		Integer pageIndex;
+		ArrayList<ToggleButton> imageButtons = new ArrayList<ToggleButton>();
+
+		ExtractPdfImages(Integer pageIndex) {
+			this.pageIndex = pageIndex;
+		}
+
+		@Override
+		protected Void call() throws Exception {
+			// For debugging and tracking the thread...
+			Thread.currentThread().setName("ExtractPdfPageTask-Page-" + (pageIndex + 1));
+
+			long startTime = System.currentTimeMillis();
+
+			extractProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+
+			// Don't show the progressIndicator for brief transitions...
+			PauseTransition pause = new PauseTransition(Duration.millis(400));
+			pause.setOnFinished(event -> {
+				extractProgressIndicator.setVisible(true);
+				extractProgressIndicator.setOpacity(1);
+			});
+			pause.play();
+			
+			// Do the actual work...
+			extractProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+			log.info("Extracting...");
+			imageButtons = pdfModel.extractImages(pdfViewPagination.getCurrentPageIndex());
+
+			// Skip the animation for quick page turns
+			long loadTime = System.currentTimeMillis() - startTime;
+			if (loadTime < 500) {
+				pause.stop();
+				extractProgressIndicator.setVisible(false);
+			} else {
+				extractProgressIndicator.setVisible(true);
+
+				FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), extractProgressIndicator);
+				fadeTransition.setFromValue(1.0);
+				fadeTransition.setToValue(0.0);
+				fadeTransition.play();
+			}
+			
+			return null;
+		}
+
+		@Override
+		protected void done() {
+			Platform.runLater(() -> {
+				if (extractThreads.decrementAndGet() == 0) {
+					log.info("Adding " + imageButtons.size());
+					// log.info("imageTilePane.getChildren() " + imageTilePane.getChildren().size());
+					try {
+						imageTilePane.getChildren().clear();
+						imageTilePane.getChildren().addAll(imageButtons);
+					} catch (IllegalArgumentException e) {
+						log.error("Error adding tiled image buttons.", e);
+					}
+					// log.info("Done...");
+				}
+			});
 		}
 	}
 
@@ -183,10 +261,10 @@ public class PdfViewer_Controller implements Initializable {
 		}
 	}
 
-	private void extractImages() {
-		imageTilePane.getChildren().clear();
-		pdfModel.extractImages(imageTilePane, pdfViewPagination.getCurrentPageIndex());
-	}
+	// private void extractImages() {
+	// imageTilePane.getChildren().clear();
+	// pdfModel.extractImages(imageTilePane, pdfViewPagination.getCurrentPageIndex());
+	// }
 
 	public void close() {
 		pdfModel.close();
@@ -199,12 +277,11 @@ public class PdfViewer_Controller implements Initializable {
 			delta = -1;
 
 		pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex() + delta);
-		// Platform.runLater(() -> extractImages());
 	}
 
 	@FXML
 	void pdfViewPagination_onMouseClick(MouseEvent event) {
-		extractImages();
+		pdfViewPagination.setCurrentPageIndex(pdfViewPagination.getCurrentPageIndex());
 	}
 
 	@FXML

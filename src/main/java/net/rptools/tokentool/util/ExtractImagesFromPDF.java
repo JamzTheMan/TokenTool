@@ -30,7 +30,6 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAppearanceEntry;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
 
-import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ToggleButton;
@@ -41,7 +40,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.TilePane;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 
 import org.apache.logging.log4j.LogManager;
@@ -65,11 +63,14 @@ public final class ExtractImagesFromPDF {
 	private final static int imageButtonSize = 200;
 
 	private TokenTool_Controller tokenTool_Controller;
-	private TilePane imageTilePane;
+	private ArrayList<ToggleButton> imageButtons = new ArrayList<ToggleButton>();
 	private int currentPageNumber;
 	private String pdfName;
 
 	private FileSaveUtil fileSaveUtil = new FileSaveUtil();
+
+	private boolean isRunning;
+	private boolean interrupt;
 
 	public ExtractImagesFromPDF(PDDocument document, String pdfName, TokenTool_Controller tokenTool_Controller) {
 		this.tokenTool_Controller = tokenTool_Controller;
@@ -77,13 +78,18 @@ public final class ExtractImagesFromPDF {
 		this.pdfName = pdfName;
 	}
 
-	public void addImages(TilePane imageTilePane, int pageNumber) throws IOException {
+	public ArrayList<ToggleButton> addImages(int pageNumber) throws IOException {
+		isRunning = true;
 		imageTracker.clear();
-		this.imageTilePane = imageTilePane;
+		imageButtons.clear();
 		this.currentPageNumber = pageNumber;
 
 		extractAnnotationImages(document.getPage(pageNumber));
 		getImagesFromResources(document.getPage(pageNumber).getResources());
+		
+		isRunning = false;
+		interrupt = false;
+		return imageButtons;
 	}
 
 	private void getImagesFromResources(PDResources resources) throws IOException {
@@ -98,6 +104,9 @@ public final class ExtractImagesFromPDF {
 		Collections.reverse(xObjectNamesReversed);
 
 		for (COSName xObjectName : xObjectNamesReversed) {
+			if(interrupt)
+				return;
+			
 			PDXObject xObject = resources.getXObject(xObjectName);
 
 			if (xObject instanceof PDFormXObject) {
@@ -142,6 +151,9 @@ public final class ExtractImagesFromPDF {
 	}
 
 	private void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
+		if(interrupt)
+			return;
+		
 		PDResources resources = appearance.getAppearanceStream().getResources();
 		if (resources == null)
 			return;
@@ -234,7 +246,18 @@ public final class ExtractImagesFromPDF {
 			event.consume();
 		});
 
-		// Finally, add it to the tile pane!
-		Platform.runLater(() -> imageTilePane.getChildren().add(imageButton));
+		if(interrupt)
+			log.info("I REALLY SHOULD STOP!");
+		else
+			log.info("Free to go...");
+		
+		imageButtons.add(imageButton);
+	}
+
+	public void interrupt() {
+		log.info("isRunning? " + isRunning);
+		
+		if(isRunning)
+			interrupt = true;
 	}
 }

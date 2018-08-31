@@ -46,19 +46,24 @@
             </BorderPane>
          </children>
       </AnchorPane>
-      <ScrollPane fx:id="imageTileScrollpane" fitToWidth="true" maxWidth="235.0" minWidth="235.0" prefHeight="815.0" prefWidth="235.0" vbarPolicy="ALWAYS" HBox.hgrow="NEVER">
-        <content>
-            <AnchorPane>
-               <children>
-            <TilePane fx:id="imageTilePane" hgap="10.0" prefColumns="0" prefRows="0" vgap="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="0.0">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </TilePane>
-               </children>
-            </AnchorPane>
-        </content>
-      </ScrollPane>
+      <StackPane>
+         <children>
+            <ScrollPane fx:id="imageTileScrollpane" fitToWidth="true" maxWidth="235.0" minWidth="235.0" prefHeight="815.0" prefWidth="235.0" vbarPolicy="ALWAYS">
+              <content>
+                  <AnchorPane>
+                     <children>
+                  <TilePane fx:id="imageTilePane" hgap="10.0" prefColumns="0" prefRows="0" vgap="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="0.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </TilePane>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            <ProgressIndicator fx:id="extractProgressIndicator" scaleX="1.5" scaleY="1.5" visible="false" />
+         </children>
+      </StackPane>
       </children>
    <opaqueInsets>
       <Insets />

@@ -133,9 +133,9 @@
 								</StackPane>
 								<AnchorPane fx:id="actionPane" pickOnBounds="false">
 									<children>
-										<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="Portrait Layer" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+										<MenuButton fx:id="layerMenuButton" mnemonicParsing="false" opacity="0.75" text="%controls.layers.menu.text" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
 											<items>
-												<RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" onAction="#backgroundMenuItem_OnAction" text="Background">
+												<RadioMenuItem fx:id="backgroundMenuItem" mnemonicParsing="false" onAction="#backgroundMenuItem_OnAction" text="%controls.layers.menu.item.background">
 													<accelerator>
 														<KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 													</accelerator>
@@ -143,12 +143,12 @@
 														<ToggleGroup fx:id="selectedLayer" />
 													</toggleGroup>
 												</RadioMenuItem>
-												<RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" onAction="#portraitMenuItem_OnAction" selected="true" text="Portrait" toggleGroup="$selectedLayer">
+												<RadioMenuItem fx:id="portraitMenuItem" mnemonicParsing="false" onAction="#portraitMenuItem_OnAction" selected="true" text="%controls.layers.menu.item.portrait" toggleGroup="$selectedLayer">
 													<accelerator>
 														<KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 													</accelerator>
 												</RadioMenuItem>
-												<RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="Overlay" toggleGroup="$selectedLayer" visible="false">
+												<RadioMenuItem fx:id="overlayMenuItem" disable="true" mnemonicParsing="false" text="%controls.layers.menu.item.overlay" toggleGroup="$selectedLayer" visible="false">
 													<accelerator>
 														<KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
 													</accelerator>

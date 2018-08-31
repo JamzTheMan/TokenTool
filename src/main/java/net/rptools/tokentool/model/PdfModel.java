@@ -14,13 +14,14 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.TilePane;
 import net.rptools.tokentool.controller.TokenTool_Controller;
 import net.rptools.tokentool.util.ExtractImagesFromPDF;
 
@@ -89,11 +90,17 @@ public class PdfModel {
 		}
 	}
 
-	public void extractImages(TilePane tilePane, int currentPageIndex) {
+	public ArrayList<ToggleButton> extractImages(int currentPageIndex) {
 		try {
-			imageExtractor.addImages(tilePane, currentPageIndex);
+			//imageExtractor.interrupt();
+			return imageExtractor.addImages(currentPageIndex);
 		} catch (IOException e) {
 			log.error("Error extracting images from PDF...", e);
+			return null;
 		}
+	}
+	
+	public void interrupt() {
+		imageExtractor.interrupt();
 	}
 }
