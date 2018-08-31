@@ -92,14 +92,14 @@ public class PdfModel {
 
 	public ArrayList<ToggleButton> extractImages(int currentPageIndex) {
 		try {
-			//imageExtractor.interrupt();
+			// imageExtractor.interrupt();
 			return imageExtractor.addImages(currentPageIndex);
 		} catch (IOException e) {
 			log.error("Error extracting images from PDF...", e);
 			return null;
 		}
 	}
-	
+
 	public void interrupt() {
 		imageExtractor.interrupt();
 	}

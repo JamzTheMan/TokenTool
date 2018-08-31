@@ -86,7 +86,7 @@ public final class ExtractImagesFromPDF {
 
 		extractAnnotationImages(document.getPage(pageNumber));
 		getImagesFromResources(document.getPage(pageNumber).getResources());
-		
+
 		isRunning = false;
 		interrupt = false;
 		return imageButtons;
@@ -104,9 +104,9 @@ public final class ExtractImagesFromPDF {
 		Collections.reverse(xObjectNamesReversed);
 
 		for (COSName xObjectName : xObjectNamesReversed) {
-			if(interrupt)
+			if (interrupt)
 				return;
-			
+
 			PDXObject xObject = resources.getXObject(xObjectName);
 
 			if (xObject instanceof PDFormXObject) {
@@ -151,9 +151,9 @@ public final class ExtractImagesFromPDF {
 	}
 
 	private void extractAnnotationImages(PDAppearanceEntry appearance) throws IOException {
-		if(interrupt)
+		if (interrupt)
 			return;
-		
+
 		PDResources resources = appearance.getAppearanceStream().getResources();
 		if (resources == null)
 			return;
@@ -246,18 +246,18 @@ public final class ExtractImagesFromPDF {
 			event.consume();
 		});
 
-		if(interrupt)
+		if (interrupt)
 			log.info("I REALLY SHOULD STOP!");
 		else
 			log.info("Free to go...");
-		
+
 		imageButtons.add(imageButton);
 	}
 
 	public void interrupt() {
 		log.info("isRunning? " + isRunning);
-		
-		if(isRunning)
+
+		if (isRunning)
 			interrupt = true;
 	}
 }

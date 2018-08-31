@@ -206,7 +206,7 @@ public class PdfViewer_Controller implements Initializable {
 				extractProgressIndicator.setOpacity(1);
 			});
 			pause.play();
-			
+
 			// Do the actual work...
 			extractProgressIndicator.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 			log.info("Extracting...");
@@ -225,7 +225,7 @@ public class PdfViewer_Controller implements Initializable {
 				fadeTransition.setToValue(0.0);
 				fadeTransition.play();
 			}
-			
+
 			return null;
 		}
 
