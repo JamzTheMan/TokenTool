@@ -27,13 +27,12 @@ artifacts:
   name: TokenTool-Jar
 - path: releases\release-*\TokenTool-*.exe
   name: TokenTool-Windows
-- path: releases\release-*\TokenTool-*.deb
+- path: releases\release-*\tokentool-*.deb
   name: TokenTool-Linux
 deploy:
 - provider: GitHub
   description: Windows release from AppVeyor
-  auth_token:
-    secure: $env:GITHUB_RELEASE_KEY
+  auth_token: $env:GITHUB_RELEASE_KEY
   artifact: TokenTool-Jar, TokenTool-Windows, TokenTool-Linux
   draft: false
   prerelease: true
