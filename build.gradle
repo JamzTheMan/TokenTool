@@ -61,7 +61,7 @@ ext {
 		sentryDSN = sentry_development_dsn
 	}
 
-	// vendr, tagVersion, msiVersion, and DSN's defaults are set in gradle.properties
+	// vendor, tagVersion, msiVersion, and DSN's defaults are set in gradle.properties
 	println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
 }
 
