@@ -20,7 +20,7 @@ install:
   - ./gradlew -version
 build_script:
   - ./gradlew build
-before_deploy:
+before_package:
   - ./gradlew deploy
 artifacts:
 - path: releases\release-*\TokenTool-*.jar
