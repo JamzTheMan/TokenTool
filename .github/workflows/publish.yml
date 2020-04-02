@@ -32,5 +32,5 @@ jobs:
     - name: Upload jpackage directory as artifact
       uses: actions/upload-artifact@master
       with:
-        name: TokenTool-*.*
+        name: tokentool-release
         path: releases\*\
