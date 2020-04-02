@@ -27,12 +27,10 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew jpackage
-    - name: Upload jpackage directory as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: tokentool-release
-        path: releases
-
+    - name: List directory
+      run: ls
+    - name: List releases
+      run: ls releases
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
