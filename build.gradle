@@ -103,7 +103,7 @@ jlink {
     }
 
     jpackage {
-        outputDir = "../releases/" + tagVersion
+        outputDir = "../releases"
 
         // not working :(
         // installerOutputDir = releaseDir
