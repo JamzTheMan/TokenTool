@@ -7,7 +7,6 @@ plugins {
     id "com.diffplug.gradle.spotless" version "3.28.0"
 }
 
-import org.gradle.internal.os.OperatingSystem
 import org.ajoberstar.grgit.Grgit
 
 // Apply the java plugin to add support for Java
@@ -129,10 +128,13 @@ jlink {
         // ./gradlew jpackage -PinstallerType=...
         //installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
 
-        if (OperatingSystem.current().isWindows()) {
+        println "OS Detected: " + osdetector.os
+
+        if (osdetector.os.is('windows')) {
+            println "Setting Windows installer options"
             installerType = 'exe'
             imageOptions += ['--icon', 'package/windows/TokenTool.ico']
-            installerOptions =+ [
+            installerOptions += [
                 '--win-dir-chooser',
                 '--win-per-user-install',
                 '--win-shortcut',
@@ -141,18 +143,20 @@ jlink {
             ]
         }
 
-        if (OperatingSystem.current().isMacOsX()) {
+        if (osdetector.os.is('mac')) {
+            println "Setting MacOs installer options"
             //installerType = 'pkg'
             imageOptions += ['--icon', 'package/linux/tokentool.icns']
-            installerOptions =+ [
+            installerOptions += [
                 
             ]
         }
 
-        if (OperatingSystem.current().isUnix()) {
+        if (osdetector.os.is('unix')) {
+            println "Setting Linux installer options"
             //installerType = 'dmg'
             imageOptions += ['--icon', 'package/linux/tokentool.png']
-            installerOptions =+ [
+            installerOptions += [
                 '--linux-menu-group', 'RPTools',
                  '--linux-shortcut'
             ]
