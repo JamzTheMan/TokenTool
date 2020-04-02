@@ -148,7 +148,7 @@ jlink {
             //installerType = 'pkg'
             imageOptions += ['--icon', 'package/linux/tokentool.icns']
             installerOptions += [
-                
+
             ]
         }
 
