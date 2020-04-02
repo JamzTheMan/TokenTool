@@ -1,4 +1,4 @@
-# This workflow will build a Java project with Gradle
+# This workflow will build a Java project with Gradle for verification purposes
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
 name: Build Verification
@@ -11,17 +11,22 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+        java: [ '14' ]
+      fail-fast: false
+    name: ${{ matrix.os }} JDK ${{ matrix.java }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 14
+    - name: Git checkout
+      uses: actions/checkout@v2
+    - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 14
-    - uses: actions/cache@v1
-      name: Cache Gradle
+        java-version: ${{ matrix.java }}
+    - name: Cache Gradle  
+      uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
