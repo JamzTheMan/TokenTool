@@ -3,11 +3,16 @@
 
 name: Build Verification
 
+# TEMP ignore on non-tagged push/pulls
 on:
-  push:
+  push: 
     branches: [ feature-jdk14 ]
+    tags:
+      - '*'
   pull_request:
     branches: [ feature-jdk14 ]
+    tags:
+      - '*'
 
 jobs:
   build:
