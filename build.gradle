@@ -142,10 +142,10 @@ jlink {
             ]
         }
 
-        if (osdetector.os.is('mac')) {
-            println "Setting MacOs installer options"
+        if (osdetector.os.is('osx')) {
+            println "Setting MacOS installer options"
             //installerType = 'pkg'
-            imageOptions += ['--icon', 'package/linux/tokentool.icns']
+            imageOptions += ['--icon', 'package/macosx/tokentool-icon.icns']
             installerOptions += [
 
             ]
