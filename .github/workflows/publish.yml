@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest, ubuntu-latest, macOS-latest]
         java: [ '14' ]
       fail-fast: false
     name: ${{ matrix.os }} JDK ${{ matrix.java }}
@@ -32,5 +32,5 @@ jobs:
     - name: Upload jpackage directory as artifact
       uses: actions/upload-artifact@master
       with:
-        name: tokentool-jdk${{ matrix.java }}-${{ matrix.os }}-jpackage
-        path: releases\*\TokenTool-*.*
+        name: TokenTool-*.*
+        path: releases\*\
