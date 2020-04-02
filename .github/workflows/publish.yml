@@ -27,8 +27,10 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew jpackage
+    - name: View dir
+      run: ls releases\*\*
     - name: Upload jpackage directory as artifact
       uses: actions/upload-artifact@master
       with:
         name: tokentool-jdk${{ matrix.java }}-${{ matrix.os }}-jpackage
-        path: \releases\*\TokenTool-*.*
+        path: releases\*\TokenTool-*.*
