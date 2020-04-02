@@ -28,9 +28,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew jpackage
     - name: View dir
-      run: ls releases\*\*
+      run: ls releases
     - name: Upload jpackage directory as artifact
       uses: actions/upload-artifact@master
       with:
         name: tokentool-release
-        path: releases\*\
+        path: releases
