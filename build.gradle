@@ -51,6 +51,7 @@ ext {
     releaseDir = file("/releases/")
 
     // vendor, tagVersion, msiVersion, and DSNs defaults are set in gradle.properties
+    println "OS Detected: " + osdetector.os
     println "Configuring for " + project.name + " " + tagVersion + " by " + vendor
 }
 
@@ -127,8 +128,6 @@ jlink {
 
         // ./gradlew jpackage -PinstallerType=...
         //installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
-
-        println "OS Detected: " + osdetector.os
 
         if (osdetector.os.is('windows')) {
             println "Setting Windows installer options"
