@@ -7,6 +7,7 @@ plugins {
     id "com.diffplug.gradle.spotless" version "3.28.0"
 }
 
+import org.gradle.internal.os.OperatingSystem
 import org.ajoberstar.grgit.Grgit
 
 // Apply the java plugin to add support for Java
@@ -94,6 +95,8 @@ javafx {
 jlink {
     options = ['--strip-debug', '--strip-native-commands', '--compress', '2', '--no-header-files', '--no-man-pages']
 
+    //imageDir = file("myapp-image")
+
     forceMerge('log4j-api', 'gson')
 
     launcher {
@@ -103,54 +106,69 @@ jlink {
     }
 
     jpackage {
-        outputDir = "../releases"
+        //outputDir = "../releases"
 
         // not working :(
         // installerOutputDir = releaseDir
         // installerOutputDir = file("releases")
         // imageOutputDir = file("$buildDir/my-packaging-image")
 
-        imageOptions = ['--icon', 'package/windows/TokenTool.ico']
+        imageOptions = []
         imageName = 'TokenTool'
 
         installerName = 'TokenTool'
-        installerType = 'exe'
         installerOptions = [
-                '--verbose',
-                '--description', project.description,
-                '--copyright', 'Copyright 2000-2020 RPTools.net',
-                '--license-file', 'package/license/COPYING.AFFERO',
-                '--app-version', '2.2.0',
-                '--vendor', vendor,
+            '--verbose',
+            '--description', project.description,
+            '--copyright', 'Copyright 2000-2020 RPTools.net',
+            '--license-file', 'package/license/COPYING.AFFERO',
+            '--app-version', '2.2.0',
+            '--vendor', vendor
+        ]
+
+        // ./gradlew jpackage -PinstallerType=...
+        //installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
+
+        if (OperatingSystem.current().isWindows()) {
+            installerType = 'exe'
+            imageOptions += ['--icon', 'package/windows/TokenTool.ico']
+            installerOptions =+ [
                 '--win-dir-chooser',
                 '--win-per-user-install',
                 '--win-shortcut',
                 '--win-menu',
-                '--win-menu-group', 'RPTools']
+                '--win-menu-group', 'RPTools'
+            ]
+        }
 
-                // ./gradlew jpackage -PinstallerType=...
-                // installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
-                //
-                // if (installerType == 'pkg') {
-                //     imageOptions += ['--icon', 'src/main/resources/pdfdecorator/gui/icon.icns']
-                // }
-                // if (installerType in ['deb', 'rpm']) {
-                //     imageOptions += ['--icon', 'src/main/resources/pdfdecorator/gui/icon_256x256.png']
-                //     installerOptions += [
-                //             '--linux-menu-group', 'Office',
-                //             '--linux-shortcut'
-                //     ]
-                // }
-                // if (installerType == 'deb') {
-                //     installerOptions += [
-                //             '--linux-deb-maintainer', 'office@walczak.it'
-                //     ]
-                // }
-                // if (installerType == 'rpm') {
-                //     installerOptions += [
-                //             '--linux-rpm-license-type', 'GPLv3'
-                //     ]
-                // }
+        if (OperatingSystem.current().isMacOsX()) {
+            //installerType = 'pkg'
+            imageOptions += ['--icon', 'package/linux/tokentool.icns']
+            installerOptions =+ [
+                
+            ]
+        }
+
+        if (OperatingSystem.current().isUnix()) {
+            //installerType = 'dmg'
+            imageOptions += ['--icon', 'package/linux/tokentool.png']
+            installerOptions =+ [
+                '--linux-menu-group', 'RPTools',
+                 '--linux-shortcut'
+            ]
+
+            // if (installerType == 'deb') {
+            //     installerOptions += [
+            //             '--linux-deb-maintainer', 'office@walczak.it'
+            //     ]
+            // }
+
+            // if (installerType == 'rpm') {
+            //     installerOptions += [
+            //             '--linux-rpm-license-type', 'GPLv3'
+            //     ]
+            // }
+        }
     }
 }
 
