@@ -1,4 +1,4 @@
-name: Publish Artifacts
+name: Publish Assets
 
 on: [push, pull_request]
 
@@ -13,13 +13,13 @@ jobs:
     name: ${{ matrix.os }} JDK ${{ matrix.java }}
     steps:
     - name: Git checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2.1.0
     - name: Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v1.3.0
       with:
         java-version: ${{ matrix.java }}
     - name: Cache Gradle
-      uses: actions/cache@v1
+      uses: actions/cache@v1.1.2
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -40,13 +40,8 @@ jobs:
         draft: true
         prerelease: false
         allowUpdates: true
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Release Assets
+      uses: AButler/upload-release-assets@v2.0
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: releases/TokenTool-2.2.0.exe
-        asset_name: TokenTool-2.2.0.exe
-        asset_content_type: application/octet-stream
+        files: 'releases/*.*'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
