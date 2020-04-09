@@ -3,108 +3,108 @@ on:
   release:
     types:
       - published
-    jobs:
-      build:
-        runs-on: ${{ matrix.os }}
-        strategy:
-          matrix:
-            os: [windows-latest, ubuntu-latest, macOS-latest]
-            java: [ '14' ]
-          fail-fast: false
-        name: ${{ matrix.os }} w/JDK ${{ matrix.java }}
-        steps:
-        - name: Git checkout
-          uses: actions/checkout@v2.1.0
-        - name: Set up JDK
-          uses: actions/setup-java@v1.3.0
-          with:
-            java-version: ${{ matrix.java }}
-        - name: Cache Gradle
-          uses: actions/cache@v1.1.2
-          if: matrix.os == 'ubuntu-latest'  # Cache only seems to work on ubuntu right now...
-          with:
-            path: ~/.gradle/caches
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-            restore-keys: |
-              ${{ runner.os }}-gradle-
-        - name: Build with Gradle
-          run: ./gradlew jpackage
-        - name: List releases
-          run: ls releases
-        - name: Create Release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ github.ref }}
-            release_name: Release v${{ github.ref }}
-            draft: false
-            prerelease: true
-            allowUpdates: true
-        - name: Upload Windows Release Asset
-          id: upload-release-asset-exe
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'windows-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/TokenTool-2.2.0.exe
-            asset_name: TokenTool-2.2.0.exe
-            asset_content_type: application/octet-stream
-        - name: Upload Linux RPM Release Asset
-          id: upload-release-asset-rpm
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'ubuntu-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/tokentool-2.2.0-1.x86_64.rpm
-            asset_name: tokentool-2.2.0-1.x86_64.rpm
-            asset_content_type: application/octet-stream
-        - name: Upload Linux DEB Release Asset
-          id: upload-release-asset-deb
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'ubuntu-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/tokentool_2.2.0-1_amd64.deb
-            asset_name: tokentool_2.2.0-1_amd64.deb
-            asset_content_type: application/octet-stream
-        - name: Upload Mac DMG Release Asset
-          id: upload-release-asset-dmg
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'macOS-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/TokenTool-2.2.0.dmg
-            asset_name: TokenTool-2.2.0.dmg
-            asset_content_type: application/octet-stream
-        - name: Upload Mac PKG Release Asset
-          id: upload-release-asset-pkg
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'macOS-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/TokenTool-2.2.0.pkg
-            asset_name: TokenTool-2.2.0.pkg
-            asset_content_type: application/octet-stream
-        - name: Upload Mac App Release Asset
-          id: upload-release-asset-app
-          uses: actions/upload-release-asset@v1
-          if: matrix.os == 'macOS-latest'
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-            asset_path: releases/TokenTool.app
-            asset_name: TokenTool.app
-            asset_content_type: application/octet-stream
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+        java: [ '14' ]
+      fail-fast: false
+    name: ${{ matrix.os }} w/JDK ${{ matrix.java }}
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v2.1.0
+    - name: Set up JDK
+      uses: actions/setup-java@v1.3.0
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Cache Gradle
+      uses: actions/cache@v1.1.2
+      if: matrix.os == 'ubuntu-latest'  # Cache only seems to work on ubuntu right now...
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: Build with Gradle
+      run: ./gradlew jpackage
+    - name: List releases
+      run: ls releases
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release v${{ github.ref }}
+        draft: false
+        prerelease: true
+        allowUpdates: true
+    - name: Upload Windows Release Asset
+      id: upload-release-asset-exe
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'windows-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/TokenTool-2.2.0.exe
+        asset_name: TokenTool-2.2.0.exe
+        asset_content_type: application/octet-stream
+    - name: Upload Linux RPM Release Asset
+      id: upload-release-asset-rpm
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/tokentool-2.2.0-1.x86_64.rpm
+        asset_name: tokentool-2.2.0-1.x86_64.rpm
+        asset_content_type: application/octet-stream
+    - name: Upload Linux DEB Release Asset
+      id: upload-release-asset-deb
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/tokentool_2.2.0-1_amd64.deb
+        asset_name: tokentool_2.2.0-1_amd64.deb
+        asset_content_type: application/octet-stream
+    - name: Upload Mac DMG Release Asset
+      id: upload-release-asset-dmg
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'macOS-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/TokenTool-2.2.0.dmg
+        asset_name: TokenTool-2.2.0.dmg
+        asset_content_type: application/octet-stream
+    - name: Upload Mac PKG Release Asset
+      id: upload-release-asset-pkg
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'macOS-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/TokenTool-2.2.0.pkg
+        asset_name: TokenTool-2.2.0.pkg
+        asset_content_type: application/octet-stream
+    - name: Upload Mac App Release Asset
+      id: upload-release-asset-app
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'macOS-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases/TokenTool.app
+        asset_name: TokenTool.app
+        asset_content_type: application/octet-stream
