@@ -40,7 +40,8 @@ ext {
         environment = "Production"
         sentryDSN = sentry_production_dsn
     } else {
-        tagVersion = "SNAPSHOT-" + revision
+        tagVersion = msiVersion
+        project.description = "SNAPSHOT-" + revision
         environment = "Development"
         sentryDSN = sentry_development_dsn
     }
@@ -57,7 +58,7 @@ ext {
 
 spotless {
     java {
-        licenseHeaderFile	'spotless.license.java'
+        licenseHeaderFile 'spotless.license.java'
         googleJavaFormat()
     }
 
@@ -83,7 +84,17 @@ run {
 
 jar {
     manifest {
-        attributes 'Main-Class': mainClassName
+        attributes 'Implementation-Title': project.name,
+                'Implementation-Version': tagVersion,
+                'Implementation-Vendor': vendor,
+                'Git-Commit': revision,
+                'Git-Commit-SHA': revisionFull,
+                'Built-By': System.getProperty('user.name'),
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Source-Compatibility': project.sourceCompatibility,
+                'Target-Compatibility': project.targetCompatibility,
+                'Main-Class': project.mainClassName
     }
 }
 
@@ -95,8 +106,6 @@ javafx {
 jlink {
     options = ['--strip-debug', '--strip-native-commands', '--compress', '2', '--no-header-files', '--no-man-pages']
 
-    //imageDir = file("myapp-image")
-
     forceMerge('log4j-api', 'gson')
 
     launcher {
@@ -106,45 +115,39 @@ jlink {
     }
 
     jpackage {
-        outputDir = "../releases"
-
         // not working :(
         // installerOutputDir = releaseDir
         // installerOutputDir = file("releases")
         // imageOutputDir = file("$buildDir/my-packaging-image")
+        outputDir = "../releases"
 
         imageOptions = []
         imageName = 'TokenTool'
 
         installerName = 'TokenTool'
         installerOptions = [
-            '--verbose',
-            '--description', project.description,
-            '--copyright', 'Copyright 2000-2020 RPTools.net',
-            '--license-file', 'package/license/COPYING.AFFERO',
-            '--app-version', '2.2.0',
-            '--vendor', vendor
+                '--verbose',
+                '--description', project.description,
+                '--copyright', 'Copyright 2000-2020 RPTools.net',
+                '--license-file', 'package/license/COPYING.AFFERO',
+                '--app-version', tagVersion,
+                '--vendor', vendor
         ]
-
-        // ./gradlew jpackage -PinstallerType=...
-        //installerType = project.findProperty('installerType') // we will pass this from the command line (example: -PinstallerType=msi)
 
         if (osdetector.os.is('windows')) {
             println "Setting Windows installer options"
-            installerType = 'exe'
             imageOptions += ['--icon', 'package/windows/TokenTool.ico']
             installerOptions += [
-                '--win-dir-chooser',
-                '--win-per-user-install',
-                '--win-shortcut',
-                '--win-menu',
-                '--win-menu-group', 'RPTools'
+                    '--win-dir-chooser',
+                    '--win-per-user-install',
+                    '--win-shortcut',
+                    '--win-menu',
+                    '--win-menu-group', 'RPTools'
             ]
         }
 
         if (osdetector.os.is('osx')) {
             println "Setting MacOS installer options"
-            //installerType = 'pkg'
             imageOptions += ['--icon', 'package/macosx/tokentool-icon.icns']
             installerOptions += [
 
@@ -153,11 +156,10 @@ jlink {
 
         if (osdetector.os.is('unix')) {
             println "Setting Linux installer options"
-            //installerType = 'dmg'
             imageOptions += ['--icon', 'package/linux/tokentool.png']
             installerOptions += [
-                '--linux-menu-group', 'RPTools',
-                 '--linux-shortcut'
+                    '--linux-menu-group', 'RPTools',
+                    '--linux-shortcut'
             ]
 
             // if (installerType == 'deb') {
