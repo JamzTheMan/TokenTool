@@ -41,9 +41,14 @@ jobs:
         draft: true
         prerelease: false
         allowUpdates: true
-    - name: Upload Release Assets
-      uses: AButler/upload-release-assets@v2.0
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      if: matrix.os == 'windows-latest'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: 'releases/*.*'
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        release-tag: ${{ github.ref }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: releases
+        asset_name: TokenTool-2.2.0.exe
+        asset_content_type: application/octet-stream
