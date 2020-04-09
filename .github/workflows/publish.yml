@@ -27,8 +27,6 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew jpackage
-    - name: List directory
-      run: ls
     - name: List releases
       run: ls releases
     - name: Create Release
@@ -39,8 +37,8 @@ jobs:
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: true
+        draft: true
+        prerelease: false
         allowUpdates: true
     - name: Upload Release Asset
       id: upload-release-asset 
@@ -51,4 +49,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: releases/TokenTool-2.2.0.exe
         asset_name: TokenTool-2.2.0.exe
-        asset_content_type: application/vnd.microsoft.portable-executable
+        asset_content_type: application/octet-stream
