@@ -32,7 +32,7 @@ jobs:
     - name: List releases
       run: ls releases
     - name: Test URL
-      run: echo ${{ github.event.release.release.upload_url }}
+      run: echo URL is ${{ github.event.release.upload_url }}
     - name: Upload Windows Release Asset
       id: upload-release-asset-exe
       uses: actions/upload-release-asset@v1
@@ -40,7 +40,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.exe
         asset_name: TokenTool-${{ github.event.release.tag_name }}.exe
         asset_content_type: application/octet-stream
@@ -51,7 +51,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/tokentool-${{ github.event.release.tag_name }}-1.x86_64.rpm
         asset_name: tokentool-${{ github.event.release.tag_name }}-x86_64.rpm
         asset_content_type: application/octet-stream
@@ -62,7 +62,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/tokentool_${{ github.event.release.tag_name }}-1_amd64.deb
         asset_name: tokentool_${{ github.event.release.tag_name }}-amd64.deb
         asset_content_type: application/octet-stream
@@ -73,7 +73,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.dmg
         asset_name: TokenTool-${{ github.event.release.tag_name }}.dmg
         asset_content_type: application/octet-stream
@@ -84,7 +84,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool-${{ github.event.release.tag_name }}.pkg
         asset_name: TokenTool-${{ github.event.release.tag_name }}.pkg
         asset_content_type: application/octet-stream
@@ -95,7 +95,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ github.event.release.release.upload_url }}
+        upload_url: ${{ github.event.release.upload_url }}
         asset_path: releases/TokenTool.app
         asset_name: TokenTool-${{ github.event.release.tag_name }}.app
         asset_content_type: application/octet-stream
