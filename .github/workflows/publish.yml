@@ -31,6 +31,8 @@ jobs:
       run: ./gradlew jpackage
     - name: List releases
       run: ls releases
+    - name: Test URL
+      run: echo ${{ github.event.release.release.upload_url }}
     - name: Upload Windows Release Asset
       id: upload-release-asset-exe
       uses: actions/upload-release-asset@v1
