@@ -18,13 +18,13 @@ on:
       - release*
 jobs:
   build:
+    name: ${{ matrix.os }} w/JDK ${{ matrix.java }}
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
         java: [ '14' ]
       fail-fast: false
-    name: ${{ matrix.os }} JDK ${{ matrix.java }}
     steps:
     - name: Git checkout
       uses: actions/checkout@v2
