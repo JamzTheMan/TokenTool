@@ -41,6 +41,9 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew jpackage
+    - name: zip up macOS app dir
+      if: matrix.os == 'macOS-latest'
+      run: cd releases/TokenTool.app; zip -r ../TokenTool.zip .
       # For debugging purposes...
     - name: List releases
       run: ls releases
@@ -136,6 +139,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: releases/TokenTool.app
-        asset_name: TokenTool-${{ github.event.release.tag_name }}.app
+        asset_path: releases/TokenTool.zip
+        asset_name: TokenTool-${{ github.event.release.tag_name }}.zip
         asset_content_type: application/octet-stream
